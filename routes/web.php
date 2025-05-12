@@ -18,9 +18,9 @@ use App\Http\Controllers\Master\AppreanceController;
 use App\Http\Controllers\Master\MenuController;
 use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\UserController;
-use App\Http\Controllers\Admin\StockOpnameController;
+use App\Http\Controllers\Admin\StockOpnameControllers;
 use App\Http\Controllers\Admin\PickerController;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Route;;
 
 /*
 |--------------------------------------------------------------------------
@@ -193,20 +193,55 @@ Route::group(['middleware' => 'userlogin'], function () {
         });
         // Stock Opname Routes
     });
-    Route::middleware(['checkRoleUser:/opname,menu'])->group(function () {
-        // Stock Opname Routes for Super Admin
-        Route::get('/admin/opname', [StockOpnameController::class, 'index'])->name('stock-opname.index');
-        Route::get('/admin/opname/{id}', [StockOpnameController::class, 'show'])->name('stock-opname.show');
-        Route::post('/admin/opname/update-status/{id}', [StockOpnameController::class, 'updateStatus'])->name('stock-opname.update-status');
-        Route::get('/admin/opname/data', [StockOpnameController::class, 'data'])->name('stock-opname.data');
+    Route::middleware(['checkRoleUser:/stkopname,menu'])->group(function () {
+        // Halaman utama daftar request stockopname
+        Route::get('/admin/stkopname', [StockOpnameControllers::class, 'index'])
+            ->name('stock-opname.index');
+
+        // Halaman detail request stockopname
+        Route::get('/admin/opname/{id}', [StockOpnameControllers::class, 'show'])
+            ->name('stock-opname.show');
+
+        // API untuk update status request (approve/reject)
+        Route::post('/admin/opname/update-status/{id}', [StockOpnameControllers::class, 'updateStatus'])
+            ->name('stock-opname.update-status');
+
+        // API untuk DataTables (menampilkan data request)
+        Route::get('/admin/opname/data', [StockOpnameControllers::class, 'data'])
+            ->name('stock-opname.data');
     });
 
-    // Stock Opname Routes for Picker
-    Route::middleware(['checkRoleUser:/opname,menu'])->group(function () {
-        Route::get('/admin/picker/opname', [PickerController::class, 'index'])->name('picker.index');
-        Route::get('/admin/picker/opname/create', [PickerController::class, 'create'])->name('picker.create');
-        Route::post('/admin/picker/opname', [PickerController::class, 'store'])->name('picker.store');
-        Route::get('/admin/picker/opname/{id}', [PickerController::class, 'show'])->name('picker.show');
-        Route::post('/admin/picker/opname/update-stock/{id}', [PickerController::class, 'updateStock'])->name('picker.update-stock');
+    Route::middleware(['checkRoleUser:/picker,menu'])->group(function () {
+        // Halaman utama picker (daftar request yang dibuat picker)
+        Route::get('/admin/picker', [PickerController::class, 'index'])
+            ->name('picker.index');
+
+        // Halaman form tambah request baru
+        Route::get('/admin/picker/create', [PickerController::class, 'create'])
+            ->name('picker.create');
+
+        // API untuk simpan request baru
+        Route::post('/admin/picker/save', [PickerController::class, 'store'])
+            ->name('picker.store');
+
+        // Halaman detail request (untuk input stok aktual)
+        Route::get('/admin/picker/opname/{id}', [PickerController::class, 'show'])
+            ->name('picker.show');
+
+        // API untuk update stok aktual
+        Route::post('/admin/picker/opname/update-stock/{id}', [PickerController::class, 'updateStock'])
+            ->name('picker.updateStock');
+
+        // API untuk DataTables (menampilkan request picker)
+        Route::get('/admin/picker/opname/data', [PickerController::class, 'getStockOpname'])
+            ->name('picker.getstockopname');
+
+        // API untuk approve request (tidak digunakan dalam flow ini)
+        Route::post('/admin/picker/opname/approve/{id}', [PickerController::class, 'approve'])
+            ->name('picker.approve');
+
+        // API untuk reject request (tidak digunakan dalam flow ini)
+        Route::post('/admin/picker/opname/reject/{id}', [PickerController::class, 'reject'])
+            ->name('picker.reject');
     });
 });

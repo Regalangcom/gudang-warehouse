@@ -14,20 +14,24 @@ class StockOpnameRequestDetailModel extends Model
         'barang_id',
         'stock_system',
         'stock_in',
-        'difference'
+        'difference',
+        'is_checked'
     ];
 
     protected $casts = [
         'stock_system' => 'decimal:2',
         'stock_in' => 'decimal:2',
-        'difference' => 'decimal:2'
+        'difference' => 'decimal:2',
+        'is_checked' => 'boolean'
     ];
 
+    // Relasi ke request
     public function stockOpnameRequest()
     {
         return $this->belongsTo(StockOpnameRequestModel::class, 'stock_id', 'stock_id');
     }
 
+    // Relasi ke barang
     public function barang()
     {
         return $this->belongsTo(BarangModel::class, 'barang_id', 'barang_id');

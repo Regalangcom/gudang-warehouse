@@ -1,51 +1,44 @@
-@extends('layouts.app')
-
+@extends('Master.Layouts.app')
+@section('title', $title)
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Buat Request Stock Opname Baru</h3>
-                    <div class="card-tools">
-                        <a href="{{ route('picker.index') }}" class="btn btn-default btn-sm">
-                            <i class="fas fa-arrow-left"></i> Kembali
-                        </a>
+
+<div class="main-content app-content mt-0 mx-auto">
+    <div class="side-app">
+        <div class="main-container container-fluid">
+            <div class="page-header">
+                <h1 class="page-title">{{ $title }}</h1>
+                <div>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('picker.index') }}">Stock Opname</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title mb-0">Form Request Stock Opname</h3>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('picker.store') }}" method="POST">
+                                @csrf
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Keterangan (Opsional)</label>
+                                    <textarea name="keterangan" class="form-control" rows="4" placeholder="Masukkan keterangan request"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Kirim Request</button>
+                                    <a href="{{ route('picker.index') }}" class="btn btn-secondary">Batal</a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <form action="{{ route('picker.store') }}" method="POST">
-                    @csrf
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Request stock opname akan dibuat untuk semua barang aktif.
-                            Setelah request dibuat, super admin akan menyetujui dan mengirimkan data stock sistem.
-                        </div>
-
-                        <div class="form-group">
-                            <label for="keterangan">Keterangan (Opsional)</label>
-                            <textarea name="keterangan" id="keterangan" class="form-control" rows="3"
-                                placeholder="Tambahkan keterangan jika diperlukan">{{ old('keterangan') }}</textarea>
-                            @error('keterangan')
-                            <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Buat Request
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        // Add any additional JavaScript if needed
-    });
-</script>
-@endpush
+@endsection

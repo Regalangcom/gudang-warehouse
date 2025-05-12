@@ -1,54 +1,22 @@
+// app/Http/Controllers/Admin/StockOpnameController.php
+
 <?php
 
-namespace App\Http\Controllers\Admin;
-
 use App\Http\Controllers\Controller;
-use App\Models\Admin\BarangModel;
-use App\Models\Admin\StockOpnameRequestDetailModel;
 use App\Models\Admin\StockOpnameRequestModel;
 use App\Models\Admin\WebModel;
+use App\Models\Admin\BarangModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-
 use Yajra\DataTables\DataTables;
 
-class StockOpnameController extends Controller
+class StockOpnameControllers extends Controller
 {
-    // public function __construct()
-    // {
-    //     // Cek session user di setiap method
-    //     if (!Session::has('user')) {
-    //         return redirect('/admin/login')->send();
-    //     }
-    // }
-
     public function index(Request $request)
     {
         $data["title"] = "Stock Opname";
         $data['web'] = WebModel::first();
         return view('Admin.StockOpname.index', $data);
-    }
-
-    public function create()
-    {
-        $data["title"] = "Buat Request Stock Opname";
-        $data['web'] = WebModel::first();
-        return view('Admin.StockOpname.create', $data);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'keterangan' => 'required'
-        ]);
-
-        $stockOpname = new StockOpnameRequestModel();
-        $stockOpname->keterangan = $request->keterangan;
-        $stockOpname->user_id = Session::get('user')->user_id;
-        $stockOpname->status_request = 'pending';
-        $stockOpname->save();
-
-        return redirect()->route('stock-opname.index')->with('success', 'Request stock opname berhasil dibuat');
     }
 
     public function show(Request $request, $id = null)
@@ -99,28 +67,6 @@ class StockOpnameController extends Controller
         return view('Admin.StockOpname.show', $data);
     }
 
-    public function updateStock(Request $request, $id)
-    {
-        $request->validate([
-            'stock_id' => 'required|array',
-            'stock_id.*' => 'required|exists:stock_opname_requests,stock_id',
-            'qty_actual' => 'required|array',
-            'qty_actual.*' => 'required|numeric|min:0'
-        ]);
-
-        $stockOpname = StockOpnameRequestModel::findOrFail($id);
-
-        foreach ($request->stock_id as $key => $stockId) {
-            $detail = $stockOpname->details()->where('stock_id', $stockId)->first();
-            if ($detail) {
-                $detail->qty_actual = $request->qty_actual[$key];
-                $detail->save();
-            }
-        }
-
-        return redirect()->route('stock-opname.show', $id)->with('success', 'Data stock berhasil diperbarui');
-    }
-
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -139,7 +85,7 @@ class StockOpnameController extends Controller
             // Generate detail barang untuk request ini
             $barangs = BarangModel::all();
             foreach ($barangs as $barang) {
-                StockOpnameRequestDetailModel::create([
+                StockOpnameRequestModel::create([
                     'stock_id' => $stockOpname->stock_id,
                     'barang_id' => $barang->barang_id,
                     'stock_system' => $barang->barang_stok,
@@ -149,12 +95,5 @@ class StockOpnameController extends Controller
         }
 
         return redirect()->route('stock-opname.index')->with('success', 'Status request berhasil diperbarui');
-    }
-
-    // Tampilan untuk Superadmin
-    public function adminIndex()
-    {
-        // Sudah di-handle di index() untuk superadmin
-        return redirect()->route('stock-opname.index');
     }
 }

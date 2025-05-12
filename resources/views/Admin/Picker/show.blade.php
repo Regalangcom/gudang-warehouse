@@ -10,7 +10,7 @@
                 <div>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('stock-opname.index') }}">Stock Opname</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('picker.index') }}">Stock Opname</a></li>
                         <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                     </ol>
                 </div>
@@ -33,10 +33,6 @@
                                         <tr>
                                             <th>Tanggal Request</th>
                                             <td>{{ \Carbon\Carbon::parse($stockOpname->request_date)->format('d-m-Y') }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Requester</th>
-                                            <td>{{ $stockOpname->user ? $stockOpname->user->user_nmlengkap : '-' }}</td>
                                         </tr>
                                         <tr>
                                             <th>Status</th>
@@ -71,6 +67,7 @@
                                             <th class="border-bottom-0">Stok Sistem</th>
                                             <th class="border-bottom-0">Stok Aktual</th>
                                             <th class="border-bottom-0">Selisih</th>
+                                            <th class="border-bottom-0" width="150px">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -79,9 +76,20 @@
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $detail->barang->barang_kode }}</td>
                                             <td>{{ $detail->barang->barang_nama }}</td>
-                                            <td>{{ $detail->stock_system }}</td>
-                                            <td>{{ $detail->stock_in ?? '-' }}</td>
                                             <td>
+                                                <span id="stock-system-{{ $detail->id }}" class="stock-system" style="display: none;">
+                                                    {{ $detail->stock_system }}
+                                                </span>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input toggle-stock" type="checkbox" data-id="{{ $detail->id }}">
+                                                    <label class="form-check-label">Lihat stok</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" id="stock-in-{{ $detail->id }}" class="form-control"
+                                                    value="{{ $detail->stock_in }}" min="0" step="1">
+                                            </td>
+                                            <td id="difference-{{ $detail->id }}">
                                                 @if($detail->stock_in !== null)
                                                 @php
                                                 $difference = $detail->stock_in - $detail->stock_system;
@@ -97,6 +105,11 @@
                                                     @else
                                                     -
                                                     @endif
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm save-stock" data-id="{{ $detail->id }}">
+                                                    <i class="fe fe-save"></i> Simpan
+                                                </button>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -130,6 +143,59 @@
     $(document).ready(function() {
         @if($stockOpname - > status_request == 'approved')
         $('#tbl_stockopname_detail').DataTable();
+
+        // Toggle tampilan stok sistem
+        $('.toggle-stock').on('change', function() {
+            const detailId = $(this).data('id');
+            if ($(this).is(':checked')) {
+                $(`#stock-system-${detailId}`).show();
+            } else {
+                $(`#stock-system-${detailId}`).hide();
+            }
+        });
+
+        // Simpan stok
+        $('.save-stock').on('click', function() {
+            const detailId = $(this).data('id');
+            const stockIn = $(`#stock-in-${detailId}`).val();
+
+            if (!stockIn) {
+                alert('Silakan masukkan stok aktual.');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('picker.updateStock', '') }}/" + detailId,
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    stock_in: stockIn
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Hitung dan update selisih
+                        const systemStock = parseFloat($(`#stock-system-${detailId}`).text());
+                        const actualStock = parseFloat(stockIn);
+                        const difference = actualStock - systemStock;
+
+                        let differenceHtml = '';
+                        if (difference > 0) {
+                            differenceHtml = `<span class="text-success">+${difference}</span>`;
+                        } else if (difference < 0) {
+                            differenceHtml = `<span class="text-danger">${difference}</span>`;
+                        } else {
+                            differenceHtml = `<span>${difference}</span>`;
+                        }
+
+                        $(`#difference-${detailId}`).html(differenceHtml);
+                        alert('Stok berhasil disimpan.');
+                    }
+                },
+                error: function(error) {
+                    alert('Terjadi kesalahan. Mohon coba lagi.');
+                }
+            });
+        });
         @endif
     });
 </script>

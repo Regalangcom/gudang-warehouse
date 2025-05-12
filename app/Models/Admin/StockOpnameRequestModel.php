@@ -7,15 +7,15 @@ use Illuminate\Support\Str;
 
 class StockOpnameRequestModel extends Model
 {
-    protected $table = 'stock_opname_requests';
+    protected $table = 'tbl_stock_control';
     protected $primaryKey = 'stock_id';
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
         'stock_id',
-        'request_code',
-        'request_date',
+        'product_id',
+        'stock_in',
         'status_request',
         'keterangan',
         'user_id',
@@ -24,32 +24,38 @@ class StockOpnameRequestModel extends Model
     ];
 
     protected $casts = [
-        'request_date' => 'date',
-        'approved_at' => 'datetime'
+        'stock_in' => 'decimal:2',
+        'approved_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
-    public function details()
+    // Relasi ke barang
+    public function barang()
     {
-        return $this->hasMany(StockOpnameRequestDetailModel::class, 'stock_id', 'stock_id');
+        return $this->belongsTo(BarangModel::class, 'product_id', 'barang_id');
     }
 
+    // Relasi ke user (requester)
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
+    // Relasi ke user (approver)
     public function approver()
     {
         return $this->belongsTo(UserModel::class, 'approved_by', 'user_id');
     }
 
+    // Generate kode request otomatis
     public static function generateRequestCode()
     {
         $prefix = 'SO-';
         $lastRequest = self::orderBy('created_at', 'desc')->first();
 
         if ($lastRequest) {
-            $lastNumber = (int) substr($lastRequest->request_code, 3);
+            $lastNumber = (int) substr($lastRequest->request_code ?? $prefix . '00000000', 3);
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
@@ -58,6 +64,7 @@ class StockOpnameRequestModel extends Model
         return $prefix . str_pad($newNumber, 8, '0', STR_PAD_LEFT);
     }
 
+    // Boot method untuk otomatis mengisi UUID
     protected static function boot()
     {
         parent::boot();
@@ -65,12 +72,6 @@ class StockOpnameRequestModel extends Model
         static::creating(function ($model) {
             if (empty($model->stock_id)) {
                 $model->stock_id = (string) Str::uuid();
-            }
-            if (empty($model->request_code)) {
-                $model->request_code = self::generateRequestCode();
-            }
-            if (empty($model->request_date)) {
-                $model->request_date = now();
             }
         });
     }
