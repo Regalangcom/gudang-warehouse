@@ -50,6 +50,7 @@ class PickerController extends Controller
                     ->with('error', 'Tidak dapat membuat request. Belum ada produk yang tersedia.');
             }
 
+            // Buat record stock opname dan simpan ke variabel
             $stockOpname = StockOpnameRequestModel::create([
                 'request_code' => $requestCode,
                 'request_date' => now(),
@@ -60,8 +61,15 @@ class PickerController extends Controller
                 'stock_in' => 0 // Default stock_in = 0
             ]);
 
+            // Contoh penggunaan record yang baru dibuat
+            // Log::info('Stock Opname created', ['stock_id' => $stockOpname->stock_id]);
+
+            // Redirect ke halaman detail jika Anda mau
+            // return redirect()->route('picker.show', $stockOpname->stock_id)
+            //    ->with('success', 'Request Stock Opname berhasil dibuat.');
+
             return redirect()->route('picker.index')
-                ->with('success', 'Request Stock Opname berhasil dibuat.');
+                ->with('success', 'Request Stock Opname berhasil dibuat. ID: ' . $stockOpname->stock_id);
         } catch (\Exception $e) {
             return redirect()->route('picker.index')
                 ->with('error', 'Gagal membuat request: ' . $e->getMessage());
