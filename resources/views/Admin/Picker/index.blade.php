@@ -37,8 +37,32 @@
                                             <th class="border-bottom-0" width="100px">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody>
+                                        @foreach($requests as $request)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $request->request_code }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($request->request_date)->format('d-m-Y') }}</td>
+                                            <td>
+                                                @if($request->status_request == 'pending')
+                                                <span class="badge bg-warning">Pending</span>
+                                                @elseif($request->status_request == 'approved')
+                                                <span class="badge bg-success">Disetujui</span>
+                                                @elseif($request->status_request == 'rejected')
+                                                <span class="badge bg-danger">Ditolak</span>
+                                                @else
+                                                <span class="badge bg-secondary">Tidak Diketahui</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-info btn-sm" href="{{ route('picker.show', $request->stock_id) }}"><span class="fe fe-eye text-white fs-14"></span></a>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
                                 </table>
+
+
                             </div>
                         </div>
                     </div>
