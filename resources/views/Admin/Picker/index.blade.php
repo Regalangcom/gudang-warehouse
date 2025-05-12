@@ -54,19 +54,11 @@
 <script>
     $(document).ready(function() {
         // Load DataTables dengan URL yang sesuai berdasarkan role
-        @if($current_role == 2) {
-            {
-                --Picker--
-            }
-        }
-        var ajaxUrl = "{{ route('picker.getstockopname') }}";
-        @else {
-            {
-                --Super Admin atau role lain--
-            }
-        }
-        var ajaxUrl = "{{ route('stock-opname.data') }}";
-        @endif
+        <?php if ($current_role == 3) { ?>
+            var ajaxUrl = "<?php echo route('picker.getstockopname'); ?>";
+        <?php } else { ?>
+            var ajaxUrl = "<?php echo route('stock-opname.data'); ?>";
+        <?php } ?>
 
         $('#tbl_stockopname').DataTable({
             processing: true,
