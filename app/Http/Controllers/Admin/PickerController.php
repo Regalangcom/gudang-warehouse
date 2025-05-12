@@ -22,6 +22,12 @@ class PickerController extends Controller
             ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_submenu.submenu_judul' => 'Stock Opname', 'tbl_akses.akses_type' => 'create'))
             ->count();
 
+
+        // Ambil semua request stock opname untuk user yang sedang login
+        $data["requests"] = StockOpnameRequestModel::with(['user', 'approver'])
+            ->where('user_id', Session::get('user')->user_id)
+            ->orderBy('created_at', 'DESC')
+            ->get();
         // Tambahkan role_id untuk verifikasi di view
         $data["current_role"] = Session::get('user')->role_id;
 
@@ -110,7 +116,7 @@ class PickerController extends Controller
             ->where('stock_id', $id)
             ->get();
 
-        return view('Admin.StockOpname.Picker.show', $data);
+        return view('Admin.Picker.show', $data);
     }
 
     // Get Stock Opname - DataTables
