@@ -2,7 +2,7 @@
 @section('title', $title)
 @section('content')
 
-<div class="main-content app-content mt-0">
+<div class="main-content app-content mt-0 mx-auto">
     <div class="side-app">
         <div class="main-container container-fluid">
             <div class="page-header">
@@ -116,17 +116,37 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 dataType: "json",
-                error: function (xhr, error, thrown) {
+                error: function(xhr, error, thrown) {
                     console.log("AJAX error: " + thrown);
                 }
             },
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', searchable: false },
-                { data: 'kode', name: 'kode' },
-                { data: 'tanggal', name: 'tanggal' },
-                { data: 'requester', name: 'requester' },
-                { data: 'status', name: 'status' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    searchable: false
+                },
+                {
+                    data: 'kode',
+                    name: 'kode'
+                },
+                {
+                    data: 'tanggal',
+                    name: 'tanggal'
+                },
+                {
+                    data: 'requester',
+                    name: 'requester'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
             ]
         });
 

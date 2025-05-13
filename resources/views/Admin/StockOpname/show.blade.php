@@ -1,8 +1,8 @@
-@extends('Admin.Layouts.template')
+@extends('Master.Layouts.app')
 @section('title', $title)
 @section('content')
 
-<div class="main-content app-content mt-0">
+<div class="main-content app-content mt-0 mx-auto">
     <div class="side-app">
         <div class="main-container container-fluid">
             <div class="page-header">
@@ -128,7 +128,7 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        <?php if ($stockOpname-> status_request == 'approve') { ?>
+        <?php if ($stockOpname->status_request == 'approve') { ?>
             $('#tbl_stockopname_detail').DataTable();
         <?php } ?>
     });

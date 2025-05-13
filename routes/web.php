@@ -199,10 +199,10 @@ Route::group(['middleware' => 'userlogin'], function () {
         Route::get('/admin/stkopname', [StockOpnameControllers::class, 'index'])
             ->name('stock-opname.index');
         // Halaman detail request stockopname
-        Route::get('/admin/opname/{id}', [StockOpnameControllers::class, 'show'])
+        Route::get('/admin/stkopname/{id}', [StockOpnameControllers::class, 'show'])
             ->name('stock-opname.show');
         // API untuk update status request (approve/reject)
-        Route::post('/admin/opname/update-status/{id}', [StockOpnameControllers::class, 'updateStatus'])
+        Route::post('/admin/stkopname/update-status/{id}', [StockOpnameControllers::class, 'updateStatus'])
             ->name('stock-opname.update-status');
     });
 

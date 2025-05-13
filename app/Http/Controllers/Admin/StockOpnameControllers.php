@@ -18,7 +18,8 @@ class StockOpnameControllers extends Controller
 
     private string $approved, $rejected;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->approved = "approve";
         $this->rejected = "reject";
     }
@@ -46,7 +47,7 @@ class StockOpnameControllers extends Controller
             ->where('stock_id', $id)
             ->get();
 
-        return view('Admin.StockOpname.Admin.show', $data);
+        return view('Admin.StockOpname.show', $data);
     }
 
     // Data - Untuk DataTables
@@ -122,10 +123,9 @@ class StockOpnameControllers extends Controller
 
         $stockOpname = StockOpnameRequestModel::findOrFail($id);
 
-        if($request->status == "approved"){
+        if ($request->status == "approved") {
             $status = $this->approved;
-        }
-        else{
+        } else {
             $status = $this->rejected;
         }
 
@@ -156,6 +156,4 @@ class StockOpnameControllers extends Controller
 
         return response()->json(['success' => 'Status berhasil diupdate']);
     }
-
-
 }
