@@ -3,25 +3,27 @@
 namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class StockOpnameRequestDetailModel extends Model
 {
-    protected $table = 'stock_opname_request_details';
-    protected $primaryKey = 'id';
+    protected $table = 'tbl_stock_control_details';
+    protected $primaryKey = 'stock_detail_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'stock_detail_id',
         'stock_id',
         'barang_id',
         'stock_system',
         'stock_in',
-        'difference',
         'is_checked'
     ];
 
     protected $casts = [
         'stock_system' => 'decimal:2',
         'stock_in' => 'decimal:2',
-        'difference' => 'decimal:2',
         'is_checked' => 'boolean'
     ];
 
@@ -37,12 +39,24 @@ class StockOpnameRequestDetailModel extends Model
         return $this->belongsTo(BarangModel::class, 'barang_id', 'barang_id');
     }
 
-    // Method untuk menghitung selisih
-    public function calculateDifference()
+    // // Method untuk menghitung selisih
+    // public function calculateDifference()
+    // {
+    //     if ($this->stock_in !== null) {
+    //         $this->difference = $this->stock_in - $this->stock_system;
+    //         $this->save();
+    //     }
+    // }
+
+
+    protected static function boot()
     {
-        if ($this->stock_in !== null) {
-            $this->difference = $this->stock_in - $this->stock_system;
-            $this->save();
-        }
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->stock_detail_id)) {
+                $model->stock_detail_id = (string) Str::uuid();
+            }
+        });
     }
 }

@@ -24,10 +24,10 @@ class PickerController extends Controller
 
 
         // Ambil semua request stock opname untuk user yang sedang login
-        $data["requests"] = StockOpnameRequestModel::with(['user', 'approver'])
-            ->where('user_id', Session::get('user')->user_id)
-            ->orderBy('created_at', 'DESC')
-            ->get();
+        // $data["requests"] = StockOpnameRequestModel::with(['user', 'approver'])
+        //     ->where('user_id', Session::get('user')->user_id)
+        //     ->orderBy('created_at', 'DESC')
+        //     ->get();
         // Tambahkan role_id untuk verifikasi di view
         $data["current_role"] = Session::get('user')->role_id;
 
@@ -49,12 +49,12 @@ class PickerController extends Controller
         try {
             // Buat request dengan default product_id tertentu
             // Misalnya, bisa menggunakan produk default atau produk pertama dari database
-            $defaultProduct = BarangModel::first();
+            // $defaultProduct = BarangModel::first();
 
-            if (!$defaultProduct) {
-                return redirect()->route('picker.index')
-                    ->with('error', 'Tidak dapat membuat request. Belum ada produk yang tersedia.');
-            }
+            // if (!$defaultProduct) {
+            //     return redirect()->route('picker.index')
+            //         ->with('error', 'Tidak dapat membuat request. Belum ada produk yang tersedia.');
+            // }
 
             // Buat record stock opname dan simpan ke variabel
             $stockOpname = StockOpnameRequestModel::create([
@@ -63,7 +63,7 @@ class PickerController extends Controller
                 'user_id' => Session::get('user')->user_id,
                 'status_request' => 'pending',
                 'keterangan' => $request->keterangan ?? '',
-                'product_id' => $defaultProduct->barang_id, // Menggunakan produk default
+                // 'product_id' => $defaultProduct->barang_id, // Menggunakan produk default
                 'stock_in' => 0 // Default stock_in = 0
             ]);
 
@@ -139,9 +139,9 @@ class PickerController extends Controller
                 ->addColumn('status', function ($row) {
                     if ($row->status_request == 'pending') {
                         return '<span class="badge bg-warning">Pending</span>';
-                    } elseif ($row->status_request == 'approved') {
+                    } elseif ($row->status_request == 'approve') {
                         return '<span class="badge bg-success">Disetujui</span>';
-                    } elseif ($row->status_request == 'rejected') {
+                    } elseif ($row->status_request == 'reject') {
                         return '<span class="badge bg-danger">Ditolak</span>';
                     } else {
                         return '<span class="badge bg-secondary">Tidak Diketahui</span>';
@@ -160,6 +160,8 @@ class PickerController extends Controller
                 ->rawColumns(['action', 'status'])
                 ->make(true);
         }
+
+        return response()->json(['error' => 'Invalid request'], 400);
     }
 
     // Update Stock - Set stok aktual
@@ -179,8 +181,13 @@ class PickerController extends Controller
             'is_checked' => true
         ]);
 
-        // Hitung selisih
-        $detail->calculateDifference();
+        $barang = BarangModel::findOrFail($detail->barang_id);
+
+        if($request->stock_in > 0){
+            $barang->update([
+                'barang_stok' => $request->stock_in + $barang->barang_stok
+            ]);
+        }
 
         return response()->json(['success' => 'Stock berhasil diupdate']);
     }

@@ -14,7 +14,7 @@ class StockOpnameRequestModel extends Model
 
     protected $fillable = [
         'stock_id',
-        'product_id',
+        'request_code',
         'stock_in',
         'status_request',
         'keterangan',
@@ -30,11 +30,11 @@ class StockOpnameRequestModel extends Model
         'updated_at' => 'datetime'
     ];
 
-    // Relasi ke barang
-    public function barang()
-    {
-        return $this->belongsTo(BarangModel::class, 'product_id', 'barang_id');
-    }
+    // // Relasi ke barang
+    // public function barang()
+    // {
+    //     return $this->belongsTo(BarangModel::class, 'product_id', 'barang_id');
+    // }
 
     // Relasi ke user (requester)
     public function user()

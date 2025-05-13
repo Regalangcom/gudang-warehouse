@@ -22,7 +22,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered text-nowrap border-bottom" id="tbl_stockopname">
+                                <table class="table table-bordered text-nowrap border-bottom" id="stock_opnames">
                                     <thead>
                                         <tr>
                                             <th class="border-bottom-0" width="50px">No</th>
@@ -33,7 +33,6 @@
                                             <th class="border-bottom-0" width="100px">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -105,40 +104,29 @@
 @endsection
 
 @section('scripts')
-<script>
+<script type="text/javascript">
     $(document).ready(function() {
-        // Load DataTables
-        $('#tbl_stockopname').DataTable({
+        $('#stock_opnames').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('stock-opname.data') }}",
-            columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    searchable: false
+            ajax: {
+                url: "{{ route('stock-opname.getdata') }}",
+                type: "GET",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                {
-                    data: 'kode',
-                    name: 'kode'
-                },
-                {
-                    data: 'tanggal',
-                    name: 'tanggal'
-                },
-                {
-                    data: 'requester',
-                    name: 'requester'
-                },
-                {
-                    data: 'status',
-                    name: 'status'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                },
+                dataType: "json",
+                error: function (xhr, error, thrown) {
+                    console.log("AJAX error: " + thrown);
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', searchable: false },
+                { data: 'kode', name: 'kode' },
+                { data: 'tanggal', name: 'tanggal' },
+                { data: 'requester', name: 'requester' },
+                { data: 'status', name: 'status' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
             ]
         });
 
@@ -159,7 +147,7 @@
                 success: function(response) {
                     if (response.success) {
                         $('#ApproveModal').modal('hide');
-                        $('#tbl_stockopname').DataTable().ajax.reload();
+                        $('#stock_opnames').DataTable().ajax.reload();
                         alert('Request stock opname berhasil disetujui.');
                     }
                 },
@@ -186,7 +174,7 @@
                 success: function(response) {
                     if (response.success) {
                         $('#RejectModal').modal('hide');
-                        $('#tbl_stockopname').DataTable().ajax.reload();
+                        $('#stock_opnames').DataTable().ajax.reload();
                         alert('Request stock opname berhasil ditolak.');
                     }
                 },

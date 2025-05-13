@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('tbl_stock_control', function (Blueprint $table) {
             $table->uuid('stock_id')->primary();
-            $table->unsignedInteger('product_id')->comment('Referensi ke barang_id di tbl_barang');
             $table->decimal('stock_in', 10, 2)->nullable();
             $table->enum('status_request', ['pending', 'approve', 'reject'])->default('pending');
             $table->string('keterangan', 500)->nullable();

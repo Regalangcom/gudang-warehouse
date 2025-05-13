@@ -128,9 +128,9 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        @if($stockOpname - > status_request == 'approved')
-        $('#tbl_stockopname_detail').DataTable();
-        @endif
+        <?php if ($stockOpname-> status_request == 'approve') { ?>
+            $('#tbl_stockopname_detail').DataTable();
+        <?php } ?>
     });
 </script>
 @endsection

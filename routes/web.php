@@ -193,23 +193,19 @@ Route::group(['middleware' => 'userlogin'], function () {
         });
         // Stock Opname Routes
     });
+
     Route::middleware(['checkRoleUser:/stkopname,menu'])->group(function () {
         // Halaman utama daftar request stockopname
         Route::get('/admin/stkopname', [StockOpnameControllers::class, 'index'])
             ->name('stock-opname.index');
-
         // Halaman detail request stockopname
         Route::get('/admin/opname/{id}', [StockOpnameControllers::class, 'show'])
             ->name('stock-opname.show');
-
         // API untuk update status request (approve/reject)
         Route::post('/admin/opname/update-status/{id}', [StockOpnameControllers::class, 'updateStatus'])
             ->name('stock-opname.update-status');
-
-        // API untuk DataTables (menampilkan data request)
-        Route::get('/admin/opname/data', [StockOpnameControllers::class, 'data'])
-            ->name('stock-opname.data');
     });
+
 
     Route::middleware(['checkRoleUser:/picker,menu'])->group(function () {
         // Halaman utama picker (daftar request yang dibuat picker)
@@ -232,10 +228,6 @@ Route::group(['middleware' => 'userlogin'], function () {
         Route::post('/admin/picker/opname/update-stock/{id}', [PickerController::class, 'updateStock'])
             ->name('picker.updateStock');
 
-        // API untuk DataTables (menampilkan request picker)
-        Route::get('/admin/picker/opname/data', [PickerController::class, 'getStockOpname'])
-            ->name('picker.getstockopname');
-
         // API untuk approve request (tidak digunakan dalam flow ini)
         Route::post('/admin/picker/opname/approve/{id}', [PickerController::class, 'approve'])
             ->name('picker.approve');
@@ -244,4 +236,14 @@ Route::group(['middleware' => 'userlogin'], function () {
         Route::post('/admin/picker/opname/reject/{id}', [PickerController::class, 'reject'])
             ->name('picker.reject');
     });
+
+
+    //list datatables
+    //admin
+    //stockopname
+    Route::get('/opname/getdata', [StockOpnameControllers::class, 'getdata'])->name('stock-opname.getdata');
+
+
+    //picker
+    Route::get('/picker/opname/data', [PickerController::class, 'getStockOpname'])->name('picker.getstockopname');
 });

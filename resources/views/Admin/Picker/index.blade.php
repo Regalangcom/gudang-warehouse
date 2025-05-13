@@ -27,7 +27,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered text-nowrap border-bottom" id="tbl_stockopname">
+                                <table class="table table-bordered text-nowrap border-bottom" id="request_stockopname">
                                     <thead>
                                         <tr>
                                             <th class="border-bottom-0" width="50px">No</th>
@@ -38,27 +38,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($requests as $request)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $request->request_code }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($request->request_date)->format('d-m-Y') }}</td>
-                                            <td>
-                                                @if($request->status_request == 'pending')
-                                                <span class="badge bg-warning">Pending</span>
-                                                @elseif($request->status_request == 'approved')
-                                                <span class="badge bg-success">Disetujui</span>
-                                                @elseif($request->status_request == 'rejected')
-                                                <span class="badge bg-danger">Ditolak</span>
-                                                @else
-                                                <span class="badge bg-secondary">Tidak Diketahui</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-info btn-sm" href="{{ route('picker.show', $request->stock_id) }}"><span class="fe fe-eye text-white fs-14"></span></a>
-                                            </td>
-                                        </tr>
-                                        @endforeach
                                     </tbody>
                                 </table>
 
@@ -75,16 +54,35 @@
 @endsection
 
 @section('scripts')
-<script>
+<script type="text/javascript">
     $(document).ready(function() {
-        // Load DataTables dengan URL yang sesuai berdasarkan role
         <?php if ($current_role == 3) { ?>
-            var ajaxUrl = "<?php echo route('picker.getstockopname'); ?>";
+            var ajaxUrl = {
+                url: "{{ route('picker.getstockopname') }}",
+                type: "GET",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: "json",
+                error: function (xhr, error, thrown) {
+                    console.log("AJAX error: " + thrown);
+                }
+            };
         <?php } else { ?>
-            var ajaxUrl = "<?php echo route('stock-opname.data'); ?>";
+            var ajaxUrl = {
+                url: "{{ route('stock-opname.getdata') }}",
+                type: "GET",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: "json",
+                error: function (xhr, error, thrown) {
+                    console.log("AJAX error: " + thrown);
+                }
+            };
         <?php } ?>
 
-        $('#tbl_stockopname').DataTable({
+        $('#request_stockopname').DataTable({
             processing: true,
             serverSide: true,
             ajax: ajaxUrl,

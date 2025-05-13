@@ -15,6 +15,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class StockOpnameControllers extends Controller
 {
+
+    private string $approved, $rejected;
+
+    public function __construct() {
+        $this->approved = "approve";
+        $this->rejected = "reject";
+    }
+
     // Index - Halaman utama untuk Super Admin
     public function index()
     {
@@ -42,7 +50,7 @@ class StockOpnameControllers extends Controller
     }
 
     // Data - Untuk DataTables
-    public function data(Request $request)
+    public function getdata(Request $request)
     {
         if ($request->ajax()) {
             $data = StockOpnameRequestModel::with('user')
@@ -63,9 +71,9 @@ class StockOpnameControllers extends Controller
                 ->addColumn('status', function ($row) {
                     if ($row->status_request == 'pending') {
                         return '<span class="badge bg-warning">Pending</span>';
-                    } elseif ($row->status_request == 'approved') {
+                    } elseif ($row->status_request == 'approve') {
                         return '<span class="badge bg-success">Disetujui</span>';
-                    } elseif ($row->status_request == 'rejected') {
+                    } elseif ($row->status_request == 'reject') {
                         return '<span class="badge bg-danger">Ditolak</span>';
                     } else {
                         return '<span class="badge bg-secondary">Tidak Diketahui</span>';
@@ -79,8 +87,8 @@ class StockOpnameControllers extends Controller
                     );
 
                     $button = '';
-                    $hakEdit = AksesModel::leftJoin('tbl_submenu', 'tbl_submenu.submenu_id', '=', 'tbl_akses.submenu_id')
-                        ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_submenu.submenu_judul' => 'Stock Opname', 'tbl_akses.akses_type' => 'update'))
+                    $hakEdit = AksesModel::leftJoin('tbl_menu', 'tbl_menu.menu_id', '=', 'tbl_akses.menu_id')
+                        ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_menu.menu_judul' => 'Stock Opname', 'tbl_akses.akses_type' => 'update'))
                         ->count();
 
                     // Tombol Lihat Detail
@@ -100,16 +108,30 @@ class StockOpnameControllers extends Controller
                 ->rawColumns(['action', 'status'])
                 ->make(true);
         }
+
+        return response()->json(['error' => 'Invalid request'], 400);
     }
 
     // Update Status - Approve atau Reject
     public function updateStatus(Request $request, $id)
     {
+
+        $request->validate([
+            'status' => 'required|in:approved,rejected',
+        ]);
+
         $stockOpname = StockOpnameRequestModel::findOrFail($id);
+
+        if($request->status == "approved"){
+            $status = $this->approved;
+        }
+        else{
+            $status = $this->rejected;
+        }
 
         // Update status
         $stockOpname->update([
-            'status_request' => $request->status,
+            'status_request' => $status,
             'approved_by' => $request->status == 'approved' ? Session::get('user')->user_id : null,
             'approved_at' => $request->status == 'approved' ? now() : null,
             'keterangan' => $request->keterangan ?? ''
@@ -127,7 +149,6 @@ class StockOpnameControllers extends Controller
                     'barang_id' => $product->barang_id,
                     'stock_system' => $product->barang_stok,
                     'stock_in' => null,
-                    'difference' => null,
                     'is_checked' => false
                 ]);
             }
@@ -135,4 +156,6 @@ class StockOpnameControllers extends Controller
 
         return response()->json(['success' => 'Status berhasil diupdate']);
     }
+
+
 }
