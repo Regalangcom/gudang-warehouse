@@ -103,8 +103,12 @@
 
 @endsection
 
+
+
 @section('scripts')
 <script type="text/javascript">
+    // better handle ajak is here 
+    // csrf token sudah terdapat di semua input framework
     $(document).ready(function() {
         $('#stock_opnames').DataTable({
             processing: true,

@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
+
+//   "debug" // @@dd()
+
+
 class StockOpnameControllers extends Controller
 {
 
@@ -89,7 +93,7 @@ class StockOpnameControllers extends Controller
 
                     $button = '';
                     $hakEdit = AksesModel::leftJoin('tbl_menu', 'tbl_menu.menu_id', '=', 'tbl_akses.menu_id')
-                        ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_menu.menu_judul' => 'Stock Opname', 'tbl_akses.akses_type' => 'update'))
+                        ->where(array('tbl_akses.role_id' => Session::get('user')->role_id, 'tbl_menu.menu_judul' => 'Stkopname', 'tbl_akses.akses_type' => 'update'))
                         ->count();
 
                     // Tombol Lihat Detail

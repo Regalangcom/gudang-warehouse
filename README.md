@@ -19,8 +19,7 @@ DELETE
 `INSERT INTO tbl_akses (menu_id, role_id, akses_type, created_at, updated_at) 
 VALUES (1748872442, 1, 'delete', NOW(), NOW());`
 
-
-ADMIN : 
+ADMIN :
 username : superadmin2
 pw : 123456789
 
@@ -29,3 +28,5 @@ pw : 12345678
 
 Kepala gudang
 pw : 12345678
+
+req ajak pake

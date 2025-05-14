@@ -43,9 +43,9 @@
                                             <td>
                                                 @if($stockOpname->status_request == 'pending')
                                                 <span class="badge bg-warning">Pending</span>
-                                                @elseif($stockOpname->status_request == 'approved')
+                                                @elseif($stockOpname->status_request == 'approve')
                                                 <span class="badge bg-success">Disetujui</span>
-                                                @elseif($stockOpname->status_request == 'rejected')
+                                                @elseif($stockOpname->status_request == 'reject')
                                                 <span class="badge bg-danger">Ditolak</span>
                                                 @else
                                                 <span class="badge bg-secondary">Tidak Diketahui</span>
@@ -60,7 +60,7 @@
                                 </div>
                             </div>
 
-                            @if($stockOpname->status_request == 'approved')
+                            @if($stockOpname->status_request == 'approve')
                             <div class="table-responsive">
                                 <table class="table table-bordered text-nowrap border-bottom" id="tbl_stockopname_detail">
                                     <thead>
@@ -103,7 +103,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            @elseif($stockOpname->status_request == 'rejected')
+                            @elseif($stockOpname->status_request == 'reject')
                             <div class="alert alert-danger">
                                 Request stock opname ditolak.
                                 @if($stockOpname->keterangan)
