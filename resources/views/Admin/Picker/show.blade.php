@@ -122,18 +122,7 @@
                                                     -
                                                     @endif
                                             </td>
-                                            <!-- <td id="final-stock-{{ $detail->stock_detail_id }}">
-                                                @if($detail->stock_in !== null)
-                                                @php
-                                                $systemStock = $totalStocks[$detail->stock_detail_id] ?? 0;
-                                                $selisih = $detail->stock_in - $systemStock;
-                                                $finalStock = $systemStock + $selisih;
-                                                @endphp
-                                                {{ $finalStock }}
-                                                @else
-                                                -
-                                                @endif
-                                            </td> -->
+
                                             @if($stockOpname->user_id == session('user')->user_id)
                                             <td>
                                                 <form id="formUpdateStock">

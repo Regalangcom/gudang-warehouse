@@ -17,6 +17,7 @@ class StockOpnameRequestModel extends Model
         'request_code',
         'stock_in',
         'status_request',
+        'barang_stok_actual',
         'keterangan',
         'user_id',
         'approved_by',
