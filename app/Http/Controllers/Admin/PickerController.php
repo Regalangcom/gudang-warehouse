@@ -344,6 +344,7 @@ class PickerController extends Controller
         // Update stock_in, stock_system, dan stock_adjustment di detail
         $detail->update([
             'stock_in' => $stockIn,
+            'stock_system' => $detail->stock_system + $selisih,
             'is_checked' => true,
         ]);
 
