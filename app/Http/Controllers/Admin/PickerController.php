@@ -249,14 +249,18 @@ class PickerController extends Controller
     {
         $detail = StockOpnameRequestDetailModel::findOrFail($id);
 
+        
         // Cek apakah user memiliki stock opname
         $stockOpname = StockOpnameRequestModel::findOrFail($detail->stock_id);
         if ($stockOpname->user_id != Session::get('user')->user_id) {
             return response()->json(['error' => 'Tindakan tidak diizinkan'], 403);
         }
-
+        
         // Ambil kode barang dari detail
         $barangKode = $detail->barang_kode ?? $detail->barang_id;
+        $barang = BarangModel::where('barang_id', $detail->barang_id)
+            ->first();
+        // return response()->json(['debug' => $barang]);
 
         // Hitung total stok menggunakan metode dari kode pertama
         $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
@@ -283,8 +287,11 @@ class PickerController extends Controller
         // Update stock_in, stock_system, dan stock_adjustment di detail
         $detail->update([
             'stock_in' => $stockIn,
-            'stock_system' => $detail->stock_system + $selisih,
             'is_checked' => true,
+        ]);
+
+        $barang->update([
+            'barang_stok'=> $barang->barang_stok + $selisih
         ]);
 
         // Ambil data barang
