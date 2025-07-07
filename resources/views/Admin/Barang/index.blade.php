@@ -100,7 +100,7 @@
       <select name="jenisbarang[]" class="form-control">
         <option value="">-- Pilih --</option>
         @foreach($jenisbarang as $jb)
-          <option value="{{ $jb->jenisbarang_id }}">{{ $jb->jenisbarang_nama }}</option>
+        <option value="{{ $jb->jenisbarang_id }}">{{ $jb->jenisbarang_nama }}</option>
         @endforeach
       </select>
     </div>
@@ -109,7 +109,7 @@
       <select name="satuan[]" class="form-control">
         <option value="">-- Pilih --</option>
         @foreach($satuan as $s)
-          <option value="{{ $s->satuan_id }}">{{ $s->satuan_nama }}</option>
+        <option value="{{ $s->satuan_id }}">{{ $s->satuan_nama }}</option>
         @endforeach
       </select>
     </div>
@@ -118,21 +118,21 @@
       <select name="merk[]" class="form-control">
         <option value="">-- Pilih --</option>
         @foreach($merk as $m)
-          <option value="{{ $m->merk_id }}">{{ $m->merk_nama }}</option>
+        <option value="{{ $m->merk_id }}">{{ $m->merk_nama }}</option>
         @endforeach
       </select>
     </div>
     <div class="col-md-3 mt-2">
       <label class="form-label">Harga <span class="text-danger">*</span></label>
       <input type="text" name="harga[]" class="form-control"
-             oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+        oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
     </div>
     <div class="col-md-3 mt-2">
       <label class="form-label">Foto</label>
       <div class="d-flex align-items-center">
         <img src="{{ url('/assets/default/barang/image.png') }}" class="outputImg me-2" width="60" alt="preview">
         <input type="file" name="photo[]" class="form-control photo-input"
-               accept=".png,.jpeg,.jpg,.svg" onchange="VerifyFileNameAndFileSize(this)">
+          accept=".png,.jpeg,.jpg,.svg" onchange="VerifyFileNameAndFileSize(this)">
       </div>
     </div>
     <div class="col-md-1 mt-2">
@@ -143,7 +143,7 @@
   </div>
 </div>
 
-@include('Admin.Barang.edit',    ['jenisbarang'=>$jenisbarang,'satuan'=>$satuan,'merk'=>$merk])
+@include('Admin.Barang.edit', ['jenisbarang'=>$jenisbarang,'satuan'=>$satuan,'merk'=>$merk])
 @include('Admin.Barang.hapus')
 @include('Admin.Barang.gambar')
 @endsection
@@ -152,7 +152,9 @@
 <script>
   // Setup AJAX CSRF
   $.ajaxSetup({
-    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
   });
 
   // 1) Inisialisasi DataTable
@@ -164,17 +166,52 @@
       scrollX: true,
       stateSave: true,
       ajax: "{{ route('barang.getbarang') }}",
-      columns: [
-        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-        { data: 'img',           name: 'barang_gambar', orderable: false, searchable: false },
-        { data: 'barang_kode',   name: 'barang_kode' },
-        { data: 'barang_nama',   name: 'barang_nama' },
-        { data: 'jenisbarang',   name: 'jenisbarang_nama' },
-        { data: 'satuan',        name: 'satuan_nama' },
-        { data: 'merk',          name: 'merk_nama' },
-        { data: 'barang_stok',   name: 'barang_stok' },
-        { data: 'currency',      name: 'barang_harga' },
-        { data: 'action',        name: 'action', orderable: false, searchable: false }
+      columns: [{
+          data: 'DT_RowIndex',
+          name: 'DT_RowIndex',
+          orderable: false,
+          searchable: false
+        },
+        {
+          data: 'img',
+          name: 'barang_gambar',
+          orderable: false,
+          searchable: false
+        },
+        {
+          data: 'barang_kode',
+          name: 'barang_kode'
+        },
+        {
+          data: 'barang_nama',
+          name: 'barang_nama'
+        },
+        {
+          data: 'jenisbarang',
+          name: 'jenisbarang_nama'
+        },
+        {
+          data: 'satuan',
+          name: 'satuan_nama'
+        },
+        {
+          data: 'merk',
+          name: 'merk_nama'
+        },
+        {
+          data: 'barang_stok',
+          name: 'barang_stok'
+        },
+        {
+          data: 'currency',
+          name: 'barang_harga'
+        },
+        {
+          data: 'action',
+          name: 'action',
+          orderable: false,
+          searchable: false
+        }
       ]
     });
 
@@ -187,6 +224,9 @@
     let tpl = $('#template-row').html();
     $('#barang-rows').append(tpl);
     generateIDRow($('#barang-rows .barang-row').last());
+    generateIDRow($row);
+    dd($row)
+    console.log("Kode setelah generate:", $row.find("input[name='kode[]']").val());
   }
 
   // 3) Reset semua baris jadi 1
@@ -197,9 +237,23 @@
   }
 
   // 4) Generate kode barang unik per baris
+  // function generateIDRow($row) {
+  //   let kode = 'BRG-' + Date.now();
+  //   $row.find("input[name='kode[]']").val(kode);
+  // }
+
   function generateIDRow($row) {
-    let kode = 'BRG-' + Date.now();
-    $row.find("input[name='kode[]']").val(kode);
+    if (!$row.length) return;
+
+    let kode = 'BRG-' + Date.now() + Math.floor(Math.random() * 1000); // + random biar unik
+    let $kodeInput = $row.find("input[name='kode[]']");
+
+    // Pastikan input ditemukan
+    if ($kodeInput.length) {
+      $kodeInput.val(kode);
+    } else {
+      console.warn('Input kode[] tidak ditemukan di baris ini:', $row);
+    }
   }
 
   // 5) Validasi & kirim form multi
@@ -211,24 +265,27 @@
 
     $('#barang-rows .barang-row').each(function(i, row) {
       let $r = $(row),
-          kode  = $r.find("input[name='kode[]']").val().trim(),
-          nama  = $r.find("input[name='nama[]']").val().trim(),
-          harga = $r.find("input[name='harga[]']").val().trim();
+        kode = $r.find("input[name='kode[]']").val().trim(),
+        nama = $r.find("input[name='nama[]']").val().trim(),
+        harga = $r.find("input[name='harga[]']").val().trim();
 
       if (!kode) {
-        swal('Baris '+(i+1)+': Kode wajib diisi!','', 'warning');
+        swal('Baris ' + (i + 1) + ': Kode wajib diisi!', '', 'warning');
         $r.find("input[name='kode[]']").addClass('is-invalid');
-        valid = false; return false;
+        valid = false;
+        return false;
       }
       if (!nama) {
-        swal('Baris '+(i+1)+': Nama wajib diisi!','', 'warning');
+        swal('Baris ' + (i + 1) + ': Nama wajib diisi!', '', 'warning');
         $r.find("input[name='nama[]']").addClass('is-invalid');
-        valid = false; return false;
+        valid = false;
+        return false;
       }
       if (!harga) {
-        swal('Baris '+(i+1)+': Harga wajib diisi!','', 'warning');
+        swal('Baris ' + (i + 1) + ': Harga wajib diisi!', '', 'warning');
         $r.find("input[name='harga[]']").addClass('is-invalid');
-        valid = false; return false;
+        valid = false;
+        return false;
       }
     });
 
@@ -239,18 +296,71 @@
     submitForm();
   }
 
+  // function submitForm() {
+  //   let fd = new FormData();
+  //   // append array fields
+  //   $("input[name='kode[]']").each((i, el) => fd.append('kode[]', el.value));
+  //   $("input[name='nama[]']").each((i, el) => fd.append('nama[]', el.value));
+  //   $("select[name='jenisbarang[]']").each((i, el) => fd.append('jenisbarang[]', el.value));
+  //   $("select[name='satuan[]']").each((i, el) => fd.append('satuan[]', el.value));
+  //   $("select[name='merk[]']").each((i, el) => fd.append('merk[]', el.value));
+  //   $("input[name='harga[]']").each((i, el) => fd.append('harga[]', el.value));
+  //   // file uploads
+  //   $(".photo-input").each((i, el) => {
+  //     if (el.files[0]) fd.append('photo[]', el.files[0]);
+  //   });
+
+  //   $.ajax({
+  //     type: 'POST',
+  //     url: "{{ route('barang.store') }}",
+  //     processData: false,
+  //     contentType: false,
+  //     dataType: 'json',
+  //     data: fd,
+  //     success: function() {
+  //       $('#modaldemo8').modal('hide');
+  //       swal('Berhasil ditambah!', '', 'success');
+  //       table.ajax.reload(null, false);
+  //       resetRows();
+  //     },
+  //     error: function() {
+  //       swal('Gagal menyimpan!', '', 'error');
+  //       setLoading(false);
+  //     }
+  //   });
+  // }
+
+
   function submitForm() {
     let fd = new FormData();
-    // append array fields
-    $("input[name='kode[]']").each((i,el)=> fd.append('kode[]', el.value));
-    $("input[name='nama[]']").each((i,el)=> fd.append('nama[]', el.value));
-    $("select[name='jenisbarang[]']").each((i,el)=> fd.append('jenisbarang[]', el.value));
-    $("select[name='satuan[]']").each((i,el)=> fd.append('satuan[]', el.value));
-    $("select[name='merk[]']").each((i,el)=> fd.append('merk[]', el.value));
-    $("input[name='harga[]']").each((i,el)=> fd.append('harga[]', el.value));
-    // file uploads
-    $(".photo-input").each((i,el)=> {
-      if (el.files[0]) fd.append('photo[]', el.files[0]);
+
+    // Loop semua baris
+    $('#barang-rows .barang-row').each(function(i, row) {
+      let $r = $(row);
+      let kode = $r.find("input[name='kode[]']").val().trim();
+      let nama = $r.find("input[name='nama[]']").val().trim();
+      let jenisbarang = $r.find("select[name='jenisbarang[]']").val();
+      let satuan = $r.find("select[name='satuan[]']").val();
+      let merk = $r.find("select[name='merk[]']").val();
+      let harga = $r.find("input[name='harga[]']").val().trim();
+      let photoInput = $r.find("input[name='photo[]']")[0];
+
+      // ✅ Hanya kirim jika baris terisi
+      if (kode && nama && harga) {
+        fd.append('kode[]', kode);
+        fd.append('nama[]', nama);
+        fd.append('jenisbarang[]', jenisbarang);
+        fd.append('satuan[]', satuan);
+        fd.append('merk[]', merk);
+        fd.append('harga[]', harga);
+
+        // Kirim gambar jika ada
+        if (photoInput && photoInput.files.length > 0) {
+          fd.append('photo[]', photoInput.files[0]);
+        } else {
+          fd.append('photo[]', ''); // Tetap kirim agar sejajar dengan input lainnya
+        }
+      }
     });
 
     $.ajax({
@@ -262,16 +372,20 @@
       data: fd,
       success: function() {
         $('#modaldemo8').modal('hide');
-        swal('Berhasil ditambah!','', 'success');
+        swal('Berhasil ditambah!', '', 'success');
         table.ajax.reload(null, false);
         resetRows();
       },
-      error: function() {
-        swal('Gagal menyimpan!','', 'error');
+      error: function(xhr, status, error) {
+        console.error("XHR Status:", status);
+        console.error("Error:", error);
+        // console.error("Response:", xhr.responseText);
+        swal('Gagal menyimpan!', xhr.responseText, 'error');
         setLoading(false);
       }
     });
   }
+
 
   function setLoading(on) {
     $('#btnLoader').toggleClass('d-none', !on);
@@ -283,13 +397,15 @@
     let file = input.files[0];
     if (!file) return;
     let ext = file.name.split('.').pop().toLowerCase();
-    if (!['png','jpg','jpeg','svg'].includes(ext)) {
-      swal('Format bukan gambar!','', 'warning');
-      input.value = ''; return;
+    if (!['png', 'jpg', 'jpeg', 'svg'].includes(ext)) {
+      swal('Format bukan gambar!', '', 'warning');
+      input.value = '';
+      return;
     }
     if (file.size > 3 * 1024 * 1024) {
-      swal('Ukuran maksimum 3 MB','', 'warning');
-      input.value = ''; return;
+      swal('Ukuran maksimum 3 MB', '', 'warning');
+      input.value = '';
+      return;
     }
     let url = URL.createObjectURL(file);
     $(input).closest('.barang-row').find('.outputImg').attr('src', url);
