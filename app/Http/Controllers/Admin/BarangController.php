@@ -212,6 +212,7 @@ class BarangController extends Controller
     // }
 
     public function proses_tambah(Request $request)
+
     {
         $kodes        = (array) $request->input('kode');
         $namas        = (array) $request->input('nama');
@@ -220,6 +221,8 @@ class BarangController extends Controller
         $merks        = (array) $request->input('merk');
         $hargas       = (array) $request->input('harga');
         $photos       = $request->file('photo') ?: [];
+
+        // dd($kodes);
 
         foreach ($kodes as $i => $kode) {
             $nama         = $namas[$i]        ?? '';
@@ -296,13 +299,15 @@ class BarangController extends Controller
     }
 
 
-    public function proses_hapus(Request $request, BarangModel $barang)
+    public function destroy(Request $request, BarangModel $barang)
     {
         //delete image
         Storage::delete('public/barang/' . $barang->barang_gambar);
 
         //delete
         $barang->delete();
+
+        dd($barang);
 
         return response()->json(['success' => 'Berhasil']);
     }

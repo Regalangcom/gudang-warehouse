@@ -21,7 +21,7 @@
                             <select name="jenisbarang" class="form-control">
                                 <option value="">-- Pilih --</option>
                                 @foreach ($jenisbarang as $jb)
-                                    <option value="{{$jb->jenisbarang_id}}">{{$jb->jenisbarang_nama}}</option>
+                                <option value="{{$jb->jenisbarang_id}}">{{$jb->jenisbarang_nama}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -98,6 +98,7 @@
             submitForm();
         }
     }
+
     function submitForm() {
         const kode = $("input[name='kode']").val();
         const nama = $("input[name='nama']").val();
@@ -130,9 +131,17 @@
                 });
                 table.ajax.reload(null, false);
                 reset();
+            },
+            error: function(xhr, status, error) {
+                console.error("XHR Status:", status);
+                console.error("Error:", error);
+                // console.error("Response:", xhr.responseText);
+                swal('Gagal menyimpan!', xhr.responseText, 'error');
+                setLoading(false);
             }
         });
     }
+
     function resetValid() {
         $("input[name='kode']").removeClass('is-invalid');
         $("input[name='nama']").removeClass('is-invalid');
@@ -141,6 +150,7 @@
         $("select[name='merk']").removeClass('is-invalid');
         $("input[name='harga']").removeClass('is-invalid');
     };
+
     function reset() {
         resetValid();
         $("input[name='kode']").val('');
@@ -153,6 +163,7 @@
         $("#GetFile").val('');
         setLoading(false);
     }
+
     function setLoading(bool) {
         if (bool == true) {
             $('#btnLoader').removeClass('d-none');
@@ -162,6 +173,7 @@
             $('#btnLoader').addClass('d-none');
         }
     }
+
     function fileIsValid(fileName) {
         var ext = fileName.match(/\.([^\.]+)$/)[1];
         ext = ext.toLowerCase();
@@ -178,6 +190,7 @@
         }
         return isValid;
     }
+
     function VerifyFileNameAndFileSize() {
         var file = document.getElementById('GetFile').files[0];
         if (file != null) {

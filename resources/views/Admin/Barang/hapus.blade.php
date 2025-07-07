@@ -39,10 +39,12 @@
             }
         });
     }
+
     function resetH() {
         $("input[name='idbarang']").val('');
         setLoadingH(false);
     }
+
     function setLoadingH(bool) {
         if (bool == true) {
             $('#btnLoaderH').removeClass('d-none');
