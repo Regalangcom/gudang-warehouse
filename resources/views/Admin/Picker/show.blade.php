@@ -74,11 +74,12 @@
                       <th>No</th>
                       <th>Kode Barang</th>
                       <th>Nama Barang</th>
-                      <th>Stock Awal</th>
+                      <!-- <th>Stock Before</th> -->
+                      <th>Stock Before</th>
                       <th>Total Stock<br>(Sistem)</th>
                       <th>Stock Aktual</th>
                       <th>Selisih</th>
-                      <th>Stock Akhir</th>
+                      <th>Stock After</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -89,12 +90,17 @@
                     $diff = $in !== null ? $in - $total : null;
                     $final = $diff !== null ? $total + $diff : null;
                     @endphp
+
+
                     <tr data-id="{{ $detail->stock_detail_id }}">
                       <td>{{ $i+1 }}</td>
                       <td>{{ $detail->barang->barang_kode }}</td>
                       <td>{{ $detail->barang->barang_nama }}</td>
+
+
                       <td>
-                        <span class="stock-system">{{ number_format($detail->stock_system,2) }}</span>
+                        <!-- <span class="stock-system">{{ number_format($detail->stock_system,2) }}</span> -->
+                        <span class="stock-system">{{ number_format($total,2) }}</span>
                         <div class="form-check form-switch d-inline ms-2">
                           <input class="form-check-input toggle-stock" type="checkbox">
                         </div>
@@ -196,6 +202,8 @@
                     '<span class="text-danger">' + diff + '</span>' :
                     '<span>' + diff + '</span>');
 
+
+                // Update the difference and final stock directly in the table
                 $tr.find('.difference').html(diffHtml);
                 $tr.find('.final-stock').text(final);
               }
@@ -203,12 +211,35 @@
           );
         });
 
+
         // when all AJAX calls finish
         $.when.apply($, requests).always(function() {
           alert('Semua stok berhasil disimpan.');
           $btn.prop('disabled', false).html('<i class="fe fe-save"></i> Simpan Semua');
           table.draw(false);
         });
+      });
+
+      // Perbarui perhitungan selisih dan stok akhir saat input "Stock Aktual" diubah
+      $('#stock_opnamedetail').on('input', '.stock-in', function() {
+        var $tr = $(this).closest('tr');
+        var stockSystem = parseFloat($tr.find('.stock-system').text()) || 0;
+        var stockIn = parseFloat($(this).val()) || 0;
+
+        // Hitung selisih antara stok aktual dan stok sistem
+        var selisih = stockIn - stockSystem;
+        var finalStock = stockSystem + selisih;
+
+        // Update nilai selisih dan stok akhir secara langsung di baris tersebut
+        var diffHtml = selisih > 0 ?
+          '<span class="text-success">+' + selisih + '</span>' :
+          (selisih < 0 ?
+            '<span class="text-danger">' + selisih + '</span>' :
+            '<span>' + selisih + '</span>');
+
+        // Menampilkan hasil perhitungan selisih
+        $tr.find('.difference').html(diffHtml);
+        $tr.find('.final-stock').text(finalStock);
       });
     });
   </script>

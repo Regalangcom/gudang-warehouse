@@ -11,6 +11,7 @@ use App\Models\Admin\StockOpnameRequestModel;
 use App\Models\Admin\StockOpnameRequestDetailModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -49,15 +50,6 @@ class PickerController extends Controller
         $requestCode = StockOpnameRequestModel::generateRequestCode();
 
         try {
-            // Buat request dengan default product_id tertentu
-            // Misalnya, bisa menggunakan produk default atau produk pertama dari database
-            // $defaultProduct = BarangModel::first();
-
-            // if (!$defaultProduct) {
-            //     return redirect()->route('picker.index')
-            //         ->with('error', 'Tidak dapat membuat request. Belum ada produk yang tersedia.');
-            // }
-
             // Buat record stock opname dan simpan ke variabel
             $stockOpname = StockOpnameRequestModel::create([
                 'request_code' => $requestCode,
@@ -83,25 +75,6 @@ class PickerController extends Controller
                 ->with('error', 'Gagal membuat request: ' . $e->getMessage());
         }
     }
-
-    // // Store - Simpan request baru
-    // public function store(Request $request)
-    // {
-    //     // Generate kode request jika tidak disediakan
-    //     $requestCode = StockOpnameRequestModel::generateRequestCode();
-
-    //     // Buat request
-    //     $stockOpname = StockOpnameRequestModel::create([
-    //         'request_code' => $requestCode,
-    //         'request_date' => now(),
-    //         'user_id' => Session::get('user')->user_id,
-    //         'status_request' => 'pending',
-    //         'keterangan' => $request->keterangan ?? ''
-    //     ]);
-
-    //     return redirect()->route('picker.index')
-    //         ->with('success', 'Request Stock Opname berhasil dibuat.');
-    // }
 
     // Show - Detail request
     public function show($id)
@@ -197,52 +170,7 @@ class PickerController extends Controller
         return response()->json(['error' => 'Invalid request'], 400);
     }
 
-    // Update Stock - Set stok aktual
-    // public function updateStock(Request $request, $id)
-    // {
-    //     $detail = StockOpnameRequestDetailModel::findOrFail($id);
 
-    //     // Cek apakah user memiliki stock opname
-    //     $stockOpname = StockOpnameRequestModel::findOrFail($detail->stock_id);
-    //     if ($stockOpname->user_id != Session::get('user')->user_id) {
-    //         return response()->json(['error' => 'Tindakan tidak diizinkan'], 403);
-    //     }
-
-
-
-    //     // Ambil nilai stok sistem dan stok aktual
-    //     $stockSystem = $detail->stock_system;
-    //     $stockIn = $request->stock_in;
-
-    //     // Hitung selisih
-    //     $selisih = $stockIn - $stockSystem;
-
-    //     // Update stock_in dan set is_checked
-    //     $detail->update([
-    //         'stock_in' => $stockIn,
-    //         'is_checked' => true
-    //     ]);
-
-    //     $barang = BarangModel::findOrFail($detail->barang_id);
-
-    //     // Update stok barang dengan menambahkan selisih ke stok yang ada
-    //     // Ini akan menambah atau mengurangi stok sesuai dengan selisih yang ditemukan
-    //     $newStock = $barang->barang_stok + $selisih;
-    //     if ($newStock < 0) {
-    //         $newStock = 0; // Pastikan stok tidak negatif
-    //     }
-
-    //     $barang->update([
-    //         'barang_stok' => $newStock
-    //     ]);
-
-    //     return response()->json([
-    //         'success' => 'Stock berhasil diupdate',
-    //         'stockSystem' => $stockSystem,
-    //         'stockIn' => $stockIn,
-    //         'selisih' => $selisih
-    //     ]);
-    // }
 
     // Update Stock - Set stok aktual
     // public function updateStock(Request $request, $id)
@@ -312,7 +240,6 @@ class PickerController extends Controller
     {
         $detail = StockOpnameRequestDetailModel::findOrFail($id);
 
-
         // Cek apakah user memiliki stock opname
         $stockOpname = StockOpnameRequestModel::findOrFail($detail->stock_id);
         if ($stockOpname->user_id != Session::get('user')->user_id) {
@@ -321,72 +248,70 @@ class PickerController extends Controller
 
         // Ambil kode barang dari detail
         $barangKode = $detail->barang_kode ?? $detail->barang_id;
+        // return response()->json(['debug' => $barangKode]);
         $barang = BarangModel::where('barang_id', $detail->barang_id)
             ->first();
-        // return response()->json(['debug' => $barang]);
 
+        // Hitung total stok sistem menggunakan metode sebelumnya
+        $stokawal = $detail->barang->barang_stok;
         // Hitung total stok menggunakan metode dari kode pertama
-        $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
+        $jmlmasuk = BarangmasukModel::with('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
             ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
             ->where('tbl_barangmasuk.barang_kode', '=', $barangKode)
             ->sum('tbl_barangmasuk.bm_jumlah');
 
-        $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
+        // return response()->json(['jmlmasuk' => $jmlmasuk]);
+
+
+
+        // $jmlmasuk = BarangmasukModel::where('barang_kode', $barangKode)->sum('bm_jumlah');
+        // return response()->json(['jmlmasuk' => $jmlmasuk]);
+
+
+        $jmlkeluar = BarangkeluarModel::with('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
             ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
             ->where('tbl_barangkeluar.barang_kode', '=', $barangKode)
             ->sum('tbl_barangkeluar.bk_jumlah');
 
-        // Hitung stok sistem berdasarkan selisih masuk dan keluar
-        $stockSystem = $jmlmasuk - $jmlkeluar;
 
-        // Ambil stok aktual
+        // Hitung stok sistem berdasarkan selisih masuk dan keluar
+        // $test = $jmlmasuk;
+
+
+        $stockSystem = round($stokawal +  $jmlmasuk - $jmlkeluar);
+        // return response()->json(['stockSystem' => $stockSystem]);
+        // $stokawal = $stockSystem;
+
+        // Ambil stok aktual (fisik) dari picker
         $stockIn = $request->stock_in;
 
-        // Hitung selisih
-        $selisih = $stockIn - $stockSystem;
 
-        // Update stock_in, stock_system, dan stock_adjustment di detail
+        // Hitung selisih antara stok fisik dan stok sistem
+        $selisih = round($stockIn - $stockSystem);
+
+        // return response()->json(['debugs' => $selisih]);
+
+        // Update data detail stock opname (catat hasil fisik dan status pengecekan)
+        // Simpan semua info penting di detail stock opname (jika field tersedia)
         $detail->update([
-            'stock_in' => $stockIn,
+            'stock_awal' => round($stockSystem), // simpan stok sistem sebelum opname (jika field tersedia)
+            'stock_in' => round($stockIn),       // hasil fisik
+            'selisih' => round($selisih), // simpan selisih (jika field tersedia)
             'is_checked' => true,
         ]);
+
+        // Update stok barang di sistem sesuai hasil fisik
         $barang->update([
             'barang_stok' => max(0, $stockIn) // Pastikan stok tidak negatif
         ]);
 
-        // $newStock = $barang->barang_stok + $selisih;
-        // // dd($newStock);
-        // if ($newStock < 0) {
-        //     $newStock = 0; // Pastikan stok tidak negatif
-        // }
-        // $barang->update([
-        //     'barang_stok' => $newStock
-        // ]);
 
-        // Pastikan stok tidak negatif
-        if ($newStock < 0) {
-            $newStock = 0;
-        }
-
-        // Update stok barang di database
-        $barang->update([
-            'barang_stok' => $newStock
-        ]);
-
-        // Update stok_in di tabel detail
-        $detail->update([
-            'stock_in' => $stockIn,
-            'is_checked' => true, // Tanda bahwa stok telah diperiksa
-        ]);
-
-        // Kirim respons sukses
+        // Response JSON tetap bisa menampilkan info perbandingan
         return response()->json([
-            'success' => 'Stok berhasil diupdate',
-            'stockSystem' => $stockSystem,
-            'stockIn' => $stockIn,
-
-            // 'selisih' => $selisih
-            'selisih' => $stockIn - $stockSystem
+            'success' => 'Stock berhasil diupdate',
+            'stockSystem' => round($stockSystem),
+            'stockIn' => round($stockIn),
+            'selisih' => round($selisih)
         ]);
     }
 
