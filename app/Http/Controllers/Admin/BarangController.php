@@ -11,6 +11,7 @@ use App\Models\Admin\SatuanModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class BarangController extends Controller
@@ -178,36 +179,76 @@ class BarangController extends Controller
         }
     }
 
+    // public function proses_tambah(Request $request)
+    // {
+    //     $img = "";
+    //     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->nama)));
+
+    //     //upload image
+    //     if ($request->file('foto') == null) {
+    //         $img = "image.png";
+    //     } else {
+    //         $image = $request->file('foto');
+    //         $image->storeAs('public/barang/', $image->hashName());
+    //         $img = $image->hashName();
+    //     }
+
+
+    //     //create
+    //     BarangModel::create([
+    //         'barang_gambar' => $img,
+    //         'jenisbarang_id' => $request->jenisbarang,
+    //         'satuan_id' => $request->satuan,
+    //         'merk_id' => $request->merk,
+    //         'barang_kode' => $request->kode,
+    //         'barang_nama' => $request->nama,
+    //         'barang_slug' => $slug,
+    //         'barang_harga' => $request->harga,
+    //         'barang_stok' => 0,
+
+    //     ]);
+
+    //     return response()->json(['success' => 'Berhasil']);
+    // }
+
     public function proses_tambah(Request $request)
     {
-        $img = "";
-        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->nama)));
+        $kodes        = (array) $request->input('kode');
+        $namas        = (array) $request->input('nama');
+        $jenisbars    = (array) $request->input('jenisbarang');
+        $satuans      = (array) $request->input('satuan');
+        $merks        = (array) $request->input('merk');
+        $hargas       = (array) $request->input('harga');
+        $photos       = $request->file('photo') ?: [];
 
-        //upload image
-        if ($request->file('foto') == null) {
-            $img = "image.png";
-        } else {
-            $image = $request->file('foto');
-            $image->storeAs('public/barang/', $image->hashName());
-            $img = $image->hashName();
+        foreach ($kodes as $i => $kode) {
+            $nama         = $namas[$i]        ?? '';
+            $jenisbarang  = $jenisbars[$i]    ?? null;
+            $satuan       = $satuans[$i]      ?? null;
+            $merk         = $merks[$i]        ?? null;
+            $harga        = $hargas[$i]       ?? 0;
+            $img          = 'image.png';
+
+            if (isset($photos[$i])) {
+                $file = $photos[$i];
+                $file->storeAs('public/barang/', $file->hashName());
+                $img = $file->hashName();
+            }
+
+            BarangModel::create([
+                'barang_gambar'   => $img,
+                'jenisbarang_id'  => $jenisbarang,
+                'satuan_id'       => $satuan,
+                'merk_id'         => $merk,
+                'barang_kode'     => $kode,
+                'barang_nama'     => $nama,
+                'barang_slug'     => Str::slug($nama, '-'),
+                'barang_harga'    => $harga,
+                'barang_stok'     => 0,
+            ]);
         }
 
-
-        //create
-        BarangModel::create([
-            'barang_gambar' => $img,
-            'jenisbarang_id' => $request->jenisbarang,
-            'satuan_id' => $request->satuan,
-            'merk_id' => $request->merk,
-            'barang_kode' => $request->kode,
-            'barang_nama' => $request->nama,
-            'barang_slug' => $slug,
-            'barang_harga' => $request->harga,
-            'barang_stok' => 0,
-
-        ]);
-
-        return response()->json(['success' => 'Berhasil']);
+        return response()->json(['success' => 'Semua barang berhasil ditambah.']);
     }
 
     public function proses_ubah(Request $request, BarangModel $barang)
