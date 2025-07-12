@@ -98,6 +98,7 @@
                       <td>{{ $detail->barang->barang_nama }}</td>
 
 
+
                       <td>
                         <!-- <span class="stock-system">{{ number_format($detail->stock_system,2) }}</span> -->
                         <span class="stock-system">{{ number_format($total,2) }}</span>

@@ -254,6 +254,13 @@ class PickerController extends Controller
 
         // Hitung total stok sistem menggunakan metode sebelumnya
         $stokawal = $detail->barang->barang_stok;
+
+
+        // value default stock
+        // get stock awal default
+        $stockawalbanget = $barang->barang_stok;
+        // return response()->json(['jmlmasuk' => $stockawalbanget]);
+
         // Hitung total stok menggunakan metode dari kode pertama
         $jmlmasuk = BarangmasukModel::with('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
             ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
@@ -290,7 +297,6 @@ class PickerController extends Controller
         $selisih = round($stockIn - $stockSystem);
 
         // return response()->json(['debugs' => $selisih]);
-
         // Update data detail stock opname (catat hasil fisik dan status pengecekan)
         // Simpan semua info penting di detail stock opname (jika field tersedia)
         $detail->update([
@@ -311,7 +317,8 @@ class PickerController extends Controller
             'success' => 'Stock berhasil diupdate',
             'stockSystem' => round($stockSystem),
             'stockIn' => round($stockIn),
-            'selisih' => round($selisih)
+            'selisih' => round($selisih),
+            // 'barang_stok_default' => round($stockawalbanget)
         ]);
     }
 
