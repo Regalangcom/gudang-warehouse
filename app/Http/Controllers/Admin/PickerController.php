@@ -312,13 +312,13 @@ class PickerController extends Controller
     {
         $detail = StockOpnameRequestDetailModel::findOrFail($id);
 
-        
+
         // Cek apakah user memiliki stock opname
         $stockOpname = StockOpnameRequestModel::findOrFail($detail->stock_id);
         if ($stockOpname->user_id != Session::get('user')->user_id) {
             return response()->json(['error' => 'Tindakan tidak diizinkan'], 403);
         }
-        
+
         // Ambil kode barang dari detail
         $barangKode = $detail->barang_kode ?? $detail->barang_id;
         $barang = BarangModel::where('barang_id', $detail->barang_id)
@@ -350,19 +350,18 @@ class PickerController extends Controller
             'stock_in' => $stockIn,
             'is_checked' => true,
         ]);
-
         $barang->update([
-            'barang_stok'=> $barang->barang_stok + $selisih
+            'barang_stok' => max(0, $stockIn) // Pastikan stok tidak negatif
         ]);
 
-        // Ambil data barang
-        $barang = BarangModel::findOrFail($detail->barang_id);
-
-        // Hitung selisih antara stok aktual dan stok sistem
-        $selisih = $stockIn - $stockSystem;
-
-        // Update stok barang: jika selisih positif, tambah stok; jika negatif, kurangi stok
-        $newStock = $barang->barang_stok + $selisih;
+        // $newStock = $barang->barang_stok + $selisih;
+        // // dd($newStock);
+        // if ($newStock < 0) {
+        //     $newStock = 0; // Pastikan stok tidak negatif
+        // }
+        // $barang->update([
+        //     'barang_stok' => $newStock
+        // ]);
 
         // Pastikan stok tidak negatif
         if ($newStock < 0) {
@@ -385,8 +384,9 @@ class PickerController extends Controller
             'success' => 'Stok berhasil diupdate',
             'stockSystem' => $stockSystem,
             'stockIn' => $stockIn,
-            'selisih' => $selisih,
-            'newStock' => $newStock
+
+            // 'selisih' => $selisih
+            'selisih' => $stockIn - $stockSystem
         ]);
     }
 
