@@ -213,6 +213,13 @@
     }
 
 
+    function modalBarang() {
+        $('#modalBarang').modal('show');
+        $('#modaldemo8').addClass('d-none');
+        $('input[name="param"]').val('tambah');
+        resetValid();
+        table2.ajax.reload();
+    }
 
     function resetForm() {
         resetValid();
