@@ -6,116 +6,6 @@
   <div class="side-app">
     <div class="main-container container-fluid">
 
-                            @if($stockOpname->status_request == 'approve')
-                            @foreach($details as $index => $detail)
-                            <div class="table-responsive">
-                                <table class="table table-bordered text-nowrap border-bottom" id="stock_opnamedetail">
-                                    <thead>
-                                        <tr>
-                                            <th class="border-bottom-0" width="50px">No</th>
-                                            <th class="d-none"></th>
-                                            <th class="border-bottom-0">Kode Barang</th>
-                                            <th class="border-bottom-0">Nama Barang</th>
-                                            <th class="border-bottom-0">Stock awal </th>
-                                            <th class="border-bottom-0">Total Stock (Sistem)</th>
-                                            <th class="border-bottom-0">Stock Aktual</th>
-                                            <th class="border-bottom-0">Selisih</th>
-                                            <!-- <th class="border-bottom-0">Stock Akhir</th> -->
-                                            @if($stockOpname->user_id == session('user')->user_id)
-                                            <th class="border-bottom-0" width="150px">Aksi</th>
-                                            @endif
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td class="d-none">{{ $detail->stock_detail_id }}</td>
-                                            <td>{{ $detail->barang->barang_kode }}</td>
-                                            <td>{{ $detail->barang->barang_nama }}</td>
-                                            <td>
-                                                <span id="stock-system-{{ $detail->stock_detail_id }}" class="stock-system" style="display: none;">
-                                                    <?= number_format($detail->stock_system, 2)  ?>
-                                                </span>
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input toggle-stock" type="checkbox" data-id="{{ $detail->stock_detail_id }}">
-                                                    <label class="form-check-label">Lihat total stock</label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                @php
-                                                $totalStok = $totalStocks[$detail->stock_detail_id] ?? 0;
-                                                @endphp
-                                                @if($totalStok == 0)
-                                                <span class="">{{ number_format($totalStok, 2) }}</span>
-                                                @elseif($totalStok > 0)
-                                                <span class="text-success">{{ number_format($totalStok, 2) }}</span>
-                                                @else
-                                                <span class="text-danger">{{ number_format($totalStok, 2) }}</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <input type="number" id="stock-in-{{ $detail->stock_detail_id }}" class="form-control" min="0" step="1">
-                                            </td>
-                                            <td id="difference-{{ $detail->stock_detail_id }}">
-                                                @if($detail->stock_in !== null)
-                                                @php
-                                                $selisih = $detail->stock_in - ($detail->stock_system ?? 0);
-                                                @endphp
-                                                @if($selisih > 0)
-                                                <span class="text-success">+{{ $selisih }}</span>
-                                                @elseif($selisih < 0)
-                                                    <span class="text-danger">{{ $selisih }}</span>
-                                                    @else
-                                                    <span>{{ $selisih }}</span>
-                                                    @endif
-                                                    @else
-                                                    -
-                                                    @endif
-                                            </td>
-                                            <!-- <td id="final-stock-{{ $detail->stock_detail_id }}">
-                                                @if($detail->stock_in !== null)
-                                                @php
-                                                $systemStock = $totalStocks[$detail->stock_detail_id] ?? 0;
-                                                $selisih = $detail->stock_in - $systemStock;
-                                                $finalStock = $systemStock + $selisih;
-                                                @endphp
-                                                {{ $finalStock }}
-                                                @else
-                                                -
-                                                @endif
-                                            </td> -->
-                                            @if($stockOpname->user_id == session('user')->user_id)
-                                            <td>
-                                                <form id="formUpdateStock">
-                                                    <button type="submit" class="btn btn-primary btn-sm save-stock">
-                                                        <i class="fe fe-save"></i> Simpan
-                                                    </button>
-                                                </form>
-                                            </td>
-                                            @endif
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            @endforeach
-                            @elseif($stockOpname->status_request == 'reject')
-                            <div class="alert alert-danger">
-                                Request stock opname ditolak.
-                                @if($stockOpname->keterangan)
-                                <br>Keterangan: {{ $stockOpname->keterangan }}
-                                @endif
-                            </div>
-                            @else
-                            <div class="alert alert-info">
-                                Request stock opname masih menunggu persetujuan.
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
       <!-- PAGE HEADER -->
       <div class="page-header">
         <h1 class="page-title">{{ $title }}</h1>
@@ -173,7 +63,6 @@
               </table>
 
               @if($stockOpname->status_request == 'approve')
-
               <!-- STOCK DETAIL TABLE -->
               <div class="table-responsive">
                 <table id="stock_opnamedetail" class="table table-bordered text-nowrap">
@@ -182,9 +71,8 @@
                       <th>No</th>
                       <th>Kode Barang</th>
                       <th>Nama Barang</th>
-                      <!-- <th>Stock Before</th> -->
                       <th>Stock Before</th>
-                      <th>Total Stock<br>(Sistem)</th>
+                      <th>Total Stock (Sistem)</th>
                       <th>Stock Aktual</th>
                       <th>Selisih</th>
                       <th>Stock After</th>
@@ -198,34 +86,23 @@
                     $diff = $in !== null ? $in - $total : null;
                     $final = $diff !== null ? $total + $diff : null;
                     @endphp
-
-
                     <tr data-id="{{ $detail->stock_detail_id }}">
                       <td>{{ $i+1 }}</td>
                       <td>{{ $detail->barang->barang_kode }}</td>
                       <td>{{ $detail->barang->barang_nama }}</td>
-
-
-
                       <td>
-                        <!-- <span class="stock-system">{{ number_format($detail->stock_system,2) }}</span> -->
-                        <span class="stock-system">{{ number_format($total,2) }}</span>
+                        <span class="stock-system">{{ number_format($total, 2) }}</span>
                         <div class="form-check form-switch d-inline ms-2">
                           <input class="form-check-input toggle-stock" type="checkbox">
                         </div>
                       </td>
                       <td>
                         <span class="{{ $total>0?'text-success':($total<0?'text-danger':'') }}">
-                          {{ number_format($total,2) }}
+                          {{ number_format($total, 2) }}
                         </span>
                       </td>
                       <td>
-                        <input type="number"
-                          class="form-control stock-in"
-                          data-id="{{ $detail->stock_detail_id }}"
-                          min="0"
-                          step="1"
-                          value="{{ $in }}">
+                        <input type="number" class="form-control stock-in" data-id="{{ $detail->stock_detail_id }}" min="0" step="1" value="{{ $in }}">
                       </td>
                       <td class="difference">
                         @if($diff !== null)
@@ -244,8 +121,6 @@
                   </tbody>
                 </table>
               </div>
-              <!-- /TABLE -->
-
               @elseif($stockOpname->status_request == 'reject')
               <div class="alert alert-danger">
                 Request ditolak.<br>
@@ -258,7 +133,6 @@
                 Request masih menunggu persetujuan.
               </div>
               @endif
-
             </div>
           </div>
         </div>
@@ -310,7 +184,6 @@
                   (diff < 0 ?
                     '<span class="text-danger">' + diff + '</span>' :
                     '<span>' + diff + '</span>');
-
 
                 // Update the difference and final stock directly in the table
                 $tr.find('.difference').html(diffHtml);
