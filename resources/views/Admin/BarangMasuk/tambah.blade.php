@@ -212,6 +212,8 @@
         $('input,select').removeClass('is-invalid');
     }
 
+
+
     function resetForm() {
         resetValid();
         $('input[name],select[name]').val('');
