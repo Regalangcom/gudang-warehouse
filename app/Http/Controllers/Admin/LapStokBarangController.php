@@ -115,6 +115,7 @@ class LapStokBarangController extends Controller
                     }
 
                     // 4. Hitung total stok: stok awal + masuk - keluar
+                    // $totalstok = $stokawal;
                     $totalstok = $stokawal + $jmlmasuk - $jmlkeluar;
 
                     // Format tampilan total stok
