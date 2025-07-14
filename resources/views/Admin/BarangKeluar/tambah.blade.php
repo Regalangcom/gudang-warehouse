@@ -23,7 +23,7 @@
               <select name="customer" id="customer" class="form-control">
                 <option value="">-- Pilih Customer --</option>
                 @foreach ($customer as $c)
-                  <option value="{{ $c->customer_id }}">{{ $c->customer_nama }}</option>
+                <option value="{{ $c->customer_id }}">{{ $c->customer_nama }}</option>
                 @endforeach
               </select>
             </div>
@@ -46,7 +46,8 @@
                     </div>
                     <input type="text" name="kdbarang[]" class="form-control kdbarang" autocomplete="off" placeholder="">
                     <button class="btn btn-primary-light" type="button"><i class="fe fe-search"></i></button>
-                    <button class="btn btn-success-light" type="button"><i class="fe fe-box"></i></button>
+                    <!-- <button class="btn btn-success-light" type="button"><i class="fe fe-box"></i></button> -->
+                    <button class="btn btn-success-light" onclick="modalBarang()" type="button"><i class="fe fe-box"></i></button>
                   </div>
                 </div>
                 <div class="form-group">
@@ -96,7 +97,7 @@
 @section('formTambahJS')
 <script>
   // Fungsi clone baris item
-  $('#addItem').click(function(){
+  $('#addItem').click(function() {
     let $first = $('#itemsContainer .item-row:first');
     let $clone = $first.clone();
 
@@ -108,14 +109,14 @@
   });
 
   // Hapus baris item
-  $(document).on('click', '.remove-item', function(){
+  $(document).on('click', '.remove-item', function() {
     if ($('#itemsContainer .item-row').length > 1) {
       $(this).closest('.item-row').remove();
     }
   });
 
   // Cari barang per baris
-  $(document).on('click', '.item-row .btn-primary-light', function(){
+  $(document).on('click', '.item-row .btn-primary-light', function() {
     let $row = $(this).closest('.item-row');
     let id = $row.find('.kdbarang').val().trim();
     getBarangById(id, $row);
@@ -143,19 +144,25 @@
   }
 
   // Validasi sebelum submit
-  function checkForm(){
+  function checkForm() {
     let tgl = $('input[name="tglkeluar"]').val(),
-        cust = $('select[name="customer"]').val(),
-        valid = true;
+      cust = $('select[name="customer"]').val(),
+      valid = true;
 
     // Validasi tanggal & customer
-    if (!tgl) { validasi('Tanggal Keluar wajib di isi!','warning'); valid = false; }
-    if (!cust) { validasi('Customer wajib di pilih!','warning'); valid = false; }
+    if (!tgl) {
+      validasi('Tanggal Keluar wajib di isi!', 'warning');
+      valid = false;
+    }
+    if (!cust) {
+      validasi('Customer wajib di pilih!', 'warning');
+      valid = false;
+    }
 
     // Validasi tiap item
-    $('#itemsContainer .item-row').each(function(){
+    $('#itemsContainer .item-row').each(function() {
       let status = $(this).find('.status-field').val(),
-          jml    = $(this).find('.jml').val();
+        jml = $(this).find('.jml').val();
       if (status !== 'true' || !jml || jml == '0') {
         $(this).find('.kdbarang, .jml').addClass('is-invalid');
         valid = false;
@@ -168,39 +175,50 @@
 
   // Kirim data
   function submitForm() {
-    let bkkode   = $('input[name="bkkode"]').val(),
-        tglkeluar= $('input[name="tglkeluar"]').val(),
-        customer = $('select[name="customer"]').val(),
-        tujuan   = $('input[name="tujuan"]').val(),
-        barangs  = $('input[name="kdbarang[]"]').map((i,el)=>el.value).get(),
-        jmls     = $('input[name="jml[]"]').map((i,el)=>el.value).get();
+    let bkkode = $('input[name="bkkode"]').val(),
+      tglkeluar = $('input[name="tglkeluar"]').val(),
+      customer = $('select[name="customer"]').val(),
+      tujuan = $('input[name="tujuan"]').val(),
+      barangs = $('input[name="kdbarang[]"]').map((i, el) => el.value).get(),
+      jmls = $('input[name="jml[]"]').map((i, el) => el.value).get();
 
     setLoading(true);
     $.ajax({
       type: 'POST',
       url: "{{ route('barang-keluar.store') }}",
       data: {
-        bkkode, tglkeluar, customer, tujuan,
+        bkkode,
+        tglkeluar,
+        customer,
+        tujuan,
         barang: barangs,
         jml: jmls,
         _token: '{{ csrf_token() }}'
       },
-      success: function(res){
+      success: function(res) {
         $('#modaldemo8').modal('hide');
-        swal('Berhasil!','Semua data berhasil disimpan','success');
-        table.ajax.reload(null,false);
+        swal('Berhasil!', 'Semua data berhasil disimpan', 'success');
+        table.ajax.reload(null, false);
         resetForm();
       },
-      error: function(){
-        swal('Gagal','Cek kembali data Anda','error');
+      error: function() {
+        swal('Gagal', 'Cek kembali data Anda', 'error');
       },
-      complete: function(){
+      complete: function() {
         setLoading(false);
       }
     });
   }
 
-  function resetForm(){
+  function modalBarang() {
+    $('#modalBarang').modal('show');
+    $('#modaldemo8').addClass('d-none');
+    $('input[name="param"]').val('tambah');
+    resetValid();
+    table2.ajax.reload();
+  }
+
+  function resetForm() {
     // reset statis
     $('input[name], select[name]').val('').removeClass('is-invalid');
     // kembalikan satu baris item
@@ -210,7 +228,7 @@
     setLoading(false);
   }
 
-  function setLoading(on){
+  function setLoading(on) {
     $('#btnSimpan').toggleClass('d-none', on);
     $('#btnLoader').toggleClass('d-none', !on);
   }
