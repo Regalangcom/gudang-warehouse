@@ -137,6 +137,21 @@ class LapStokBarangController extends Controller
                 //     return $result;
                 // })
 
+                // SELISIH = stokawal – totalstok
+                ->addColumn('selisih', function($row) use($request) {
+                    $stokawal = $row->barang_stok;
+                    // hitung masuk & keluar lagi
+                    $masuk = BarangmasukModel::where('barang_kode', $row->barang_kode)
+                        ->when($request->tglawal, fn($q) => $q->whereBetween('bm_tanggal', [$request->tglawal, $request->tglakhir]))
+                        ->sum('bm_jumlah');
+                    $keluar = BarangkeluarModel::where('barang_kode', $row->barang_kode)
+                        ->when($request->tglawal, fn($q) => $q->whereBetween('bk_tanggal', [$request->tglawal, $request->tglakhir]))
+                        ->sum('bk_jumlah');
+                    $totalstok = $stokawal + $masuk - $keluar;
+                    $selisih = $stokawal - $totalstok;
+                    return $selisih;
+                })
+
 
                 ->addColumn('totalstok', function ($row) use ($request) {
 

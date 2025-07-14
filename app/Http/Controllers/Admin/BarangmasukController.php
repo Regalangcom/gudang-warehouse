@@ -83,21 +83,46 @@ class BarangmasukController extends Controller
         }
     }
 
-    public function proses_tambah(Request $request)
-    {
+    // public function proses_tambah(Request $request)
+    // {
 
-        //insert data
+    //     //insert data
+    //     BarangmasukModel::create([
+    //         'bm_tanggal' => $request->tglmasuk,
+    //         'bm_kode' => $request->bmkode,
+    //         'barang_kode' => $request->barang,
+    //         'supplier_id'   => $request->supplier,
+    //         'bm_jumlah'   => $request->jml,
+    //     ]);
+
+    //     return response()->json(['success' => 'Berhasil']);
+    // }
+
+public function proses_tambah(Request $request)
+{
+    $tgl      = $request->tglmasuk;
+    $kode     = $request->bmkode;
+    $supplier = $request->supplier;
+
+    // array hasil field name="barang[]" dan name="jml[]"
+    $barangs  = $request->input('barang', []);
+    $jmls     = $request->input('jml',    []);
+
+    foreach ($barangs as $i => $barangKode) {
+        // lewati baris kosong
+        if (empty($barangKode) || empty($jmls[$i])) continue;
+
         BarangmasukModel::create([
-            'bm_tanggal' => $request->tglmasuk,
-            'bm_kode' => $request->bmkode,
-            'barang_kode' => $request->barang,
-            'supplier_id'   => $request->supplier,
-            'bm_jumlah'   => $request->jml,
+            'bm_tanggal'   => $tgl,
+            'bm_kode'      => $kode,      // sama utk semua item (nota masuk)
+            'barang_kode'  => $barangKode,
+            'supplier_id'  => $supplier,
+            'bm_jumlah'    => $jmls[$i],
         ]);
-
-        return response()->json(['success' => 'Berhasil']);
     }
 
+    return response()->json(['success' => 'Semua data berhasil disimpan']);
+}
 
     public function proses_ubah(Request $request, BarangmasukModel $barangmasuk)
     {

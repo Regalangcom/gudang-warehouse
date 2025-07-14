@@ -89,21 +89,48 @@ class BarangkeluarController extends Controller
         }
     }
 
+    // public function proses_tambah(Request $request)
+    // {
+
+    //     //insert data
+    //     BarangkeluarModel::create([
+    //         'bk_tanggal' => $request->tglkeluar,
+    //         'bk_kode' => $request->bkkode,
+    //         'barang_kode' => $request->barang,
+    //         'customer_id' => $request->customer,
+    //         'bk_tujuan'   => $request->tujuan,
+    //         'bk_jumlah'   => $request->jml,
+    //     ]);
+
+    //     return response()->json(['success' => 'Berhasil']);
+    // }
+
     public function proses_tambah(Request $request)
-    {
+{
+    $tgl = $request->tglkeluar;
+    $kode  = $request->bkkode;
+    $tujuan= $request->tujuan;
+    $customer = $request->customer;
+    $barangs = $request->input('barang', []);  // array barang_kode
+    $jumlah  = $request->input('jml', []);     // array jumlah
 
-        //insert data
+    foreach ($barangs as $i => $barang_kode) {
+        // skip kalau kosong
+        if (empty($barang_kode) || empty($jumlah[$i])) continue;
+
         BarangkeluarModel::create([
-            'bk_tanggal' => $request->tglkeluar,
-            'bk_kode' => $request->bkkode,
-            'barang_kode' => $request->barang,
-            'customer_id' => $request->customer,
-            'bk_tujuan'   => $request->tujuan,
-            'bk_jumlah'   => $request->jml,
+            'bk_tanggal'   => $tgl,
+            'bk_kode'      => $kode,
+            'barang_kode'  => $barang_kode,
+            'customer_id'  => $customer,
+            'bk_tujuan'    => $tujuan,
+            'bk_jumlah'    => $jumlah[$i],
         ]);
-
-        return response()->json(['success' => 'Berhasil']);
     }
+
+    return response()->json(['success' => 'Semua data berhasil disimpan']);
+}
+
 
     public function proses_ubah(Request $request, BarangkeluarModel $barangkeluar)
     {

@@ -51,6 +51,7 @@
                             <th class="border-bottom-0">Stok Awal</th>
                             <th class="border-bottom-0">Jumlah Masuk</th>
                             <th class="border-bottom-0">Jumlah Keluar</th>
+                            <th class="border-bottom-0">Selisih</th>
                             <th class="border-bottom-0">Total Stok</th>
                             <!-- <th class="border-bottom-0"></th> -->
                         </thead>
@@ -128,6 +129,12 @@
                 {
                     data: 'jmlkeluar',
                     name: 'barang_kode',
+                    searchable: false,
+                    orderable: false,
+                },
+                {
+                    data: 'selisih',
+                    name: 'selisih',
                     searchable: false,
                     orderable: false,
                 },
