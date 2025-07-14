@@ -52,6 +52,7 @@
                             <th class="border-bottom-0">Jumlah Masuk</th>
                             <th class="border-bottom-0">Jumlah Keluar</th>
                             <th class="border-bottom-0">Total Stok</th>
+                            <!-- <th class="border-bottom-0"></th> -->
                         </thead>
                         <tbody></tbody>
                     </table>
