@@ -20,7 +20,6 @@
         </div>
       </div>
       <!-- /PAGE HEADER -->
-
       <div class="row">
         <div class="col-12">
           <div class="card">
@@ -74,7 +73,6 @@
                       <th>No</th>
                       <th>Kode Barang</th>
                       <th>Nama Barang</th>
-                      <!-- <th>Stock Before</th> -->
                       <th>Stock Before</th>
                       <th>Total Stock<br>(Sistem)</th>
                       <th>Stock Aktual</th>
@@ -90,8 +88,6 @@
                     $diff = $in !== null ? $in - $total : null;
                     $final = $diff !== null ? $total + $diff : null;
                     @endphp
-
-
                     <tr data-id="{{ $detail->stock_detail_id }}">
                       <td>{{ $i+1 }}</td>
                       <td>{{ $detail->barang->barang_kode }}</td>

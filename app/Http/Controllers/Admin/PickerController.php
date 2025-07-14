@@ -171,71 +171,6 @@ class PickerController extends Controller
     }
 
 
-
-    // Update Stock - Set stok aktual
-    // public function updateStock(Request $request, $id)
-    // {
-    //     $detail = StockOpnameRequestDetailModel::findOrFail($id);
-
-    //     // Cek apakah user memiliki stock opname
-    //     $stockOpname = StockOpnameRequestModel::findOrFail($detail->stock_id);
-    //     if ($stockOpname->user_id != Session::get('user')->user_id) {
-    //         return response()->json(['error' => 'Tindakan tidak diizinkan'], 403);
-    //     }
-
-    //     // Ambil kode barang dari detail
-    //     $barangKode = $detail->barang_kode ?? $detail->barang_id;
-
-    //     // Hitung total stok menggunakan metode dari kode pertama
-    //     $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
-    //         ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
-    //         ->where('tbl_barangmasuk.barang_kode', '=', $barangKode)
-    //         ->sum('tbl_barangmasuk.bm_jumlah');
-
-    //     $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
-    //         ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
-    //         ->where('tbl_barangkeluar.barang_kode', '=', $barangKode)
-    //         ->sum('tbl_barangkeluar.bk_jumlah');
-
-    //     // Hitung stok sistem berdasarkan selisih masuk dan keluar
-    //     $stockSystem = $jmlmasuk - $jmlkeluar;
-
-    //     // Ambil stok aktual
-    //     $stockIn = $request->stock_in;
-
-
-    //     // $totalStocks[$detail->stock_detail_id] = $stockIn;
-    //     // Hitung selisih
-    //     $selisih = $stockIn - $stockSystem;
-
-    //     // Update stock_in, stock_system, dan stock_adjustment di detail
-    //     $detail->update([
-    //         'stock_in' => $stockIn,
-    //         'is_checked' => true,
-    //     ]);
-
-    //     // Ambil data barang
-    //     // $barang = BarangModel::findOrFail($detail->barang_id);
-
-    //     // PENTING: Kita tidak mengubah barang_stok (stok awal) di tabel barang
-    //     // Tapi kita bisa menyimpan penyesuaian di tabel lain atau menggunakan field lain
-
-    //     // Opsional: Jika Anda memiliki tabel penyesuaian stok terpisah, simpan di sana
-    //     // StockAdjustmentModel::create([
-    //     //     'barang_id' => $detail->barang_id,
-    //     //     'adjustment_value' => $selisih,
-    //     //     'stock_opname_id' => $detail->stock_id,
-    //     //     'created_by' => Session::get('user')->user_id
-    //     // ]);
-
-    //     return response()->json([
-    //         'success' => 'Stock berhasil diupdate',
-    //         'stockSystem' => $stockSystem,
-    //         'stockIn' => $stockIn,
-    //         'selisih' => $selisih
-    //     ]);
-    // }
-
     public function updateStock(Request $request, $id)
     {
         $detail = StockOpnameRequestDetailModel::findOrFail($id);
@@ -255,7 +190,6 @@ class PickerController extends Controller
         // Hitung total stok sistem menggunakan metode sebelumnya
         $stokawal = $detail->barang->barang_stok;
 
-
         // value default stock
         // get stock awal default
         $stockawalbanget = $barang->barang_stok;
@@ -268,12 +202,8 @@ class PickerController extends Controller
             ->sum('tbl_barangmasuk.bm_jumlah');
 
         // return response()->json(['jmlmasuk' => $jmlmasuk]);
-
-
-
         // $jmlmasuk = BarangmasukModel::where('barang_kode', $barangKode)->sum('bm_jumlah');
         // return response()->json(['jmlmasuk' => $jmlmasuk]);
-
 
         $jmlkeluar = BarangkeluarModel::with('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
             ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
@@ -359,4 +289,6 @@ class PickerController extends Controller
     //         ], 500);
     //     }
     // }
+
+
 }

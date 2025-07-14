@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\BarangkeluarModel;
 use App\Models\Admin\BarangmasukModel;
 use App\Models\Admin\BarangModel;
+use App\Models\Admin\StockOpnameRequestDetailModel;
 use App\Models\Admin\WebModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -80,112 +81,87 @@ class LapStokBarangController extends Controller
 
                     return $result;
                 })
+                ->addColumn('selisih', function ($row) use ($request) {
+                    // Ambil selisih dari StockOpnameRequestDetailModel
+                    $selisih = $this->getSelisih($row->barang_kode);
 
-                // ->addColumn('totalstok', function ($row) use ($request) {
-                //     // 1. Ambil stok awal dari tbl_barang
-                //     $stokawal = $row->barang_stok;
-
-                //     // 2. Hitung jumlah barang masuk
-                //     if ($request->tglawal == '') {
-                //         $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
-                //             ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
-                //             ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
-                //             ->sum('tbl_barangmasuk.bm_jumlah');
-                //     } else {
-                //         $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
-                //             ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
-                //             ->whereBetween('bm_tanggal', [$request->tglawal, $request->tglakhir])
-                //             ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
-                //             ->sum('tbl_barangmasuk.bm_jumlah');
-                //     }
-
-                //     // 3. Hitung jumlah barang keluar
-                //     if ($request->tglawal) {
-                //         $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
-                //             ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
-                //             ->whereBetween('bk_tanggal', [$request->tglawal, $request->tglakhir])
-                //             ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
-                //             ->sum('tbl_barangkeluar.bk_jumlah');
-                //     } else {
-                //         $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
-                //             ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
-                //             ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
-                //             ->sum('tbl_barangkeluar.bk_jumlah');
-                //     }
-
-                //     // 4. Hitung stok sistem: stok awal + masuk - keluar
-                //     $stockSystem = $stokawal + $jmlmasuk - $jmlkeluar;
-
-                //     // 5. Dapatkan nilai stok aktual dari input picker
-                //     $stockIn = $row->barang_stok_actual; // Pastikan $row memiliki kolom 'barang_stok_actual' yang diinputkan picker
-
-                //     // 6. Hitung selisih antara stok sistem dan stok aktual
-                //     $selisih = $stockIn - $stockSystem;
-
-                //     // 7. Hitung total stok dengan selisih
-                //     $totalstok = $stockSystem + $selisih;
-
-                //     // Format tampilan total stok
-                //     if ($totalstok == 0) {
-                //         $result = '<span class="">' . $totalstok . '</span>';
-                //     } else if ($totalstok > 0) {
-                //         $result = '<span class="text-success">' . $totalstok . '</span>';
-                //     } else {
-                //         $result = '<span class="text-danger">' . $totalstok . '</span>';
-                //     }
-
-                //     return $result;
-                // })
-
+                    // Format hasil selisih dengan penandaan warna
+                    if ($selisih > 0) {
+                        return '<span class="text-success">+' . number_format($selisih, 2) . '</span>';
+                    } elseif ($selisih < 0) {
+                        return '<span class="text-danger">' . number_format($selisih, 2) . '</span>';
+                    } else {
+                        return '<span>' . number_format($selisih, 2) . '</span>';
+                    }
+                })
 
                 ->addColumn('totalstok', function ($row) use ($request) {
 
                     // 1. Ambil stok awal dari tbl_barang
                     $stokawal = $row->barang_stok;
+                    $jmlmasuk = $this->calculateIncomingStock($row, $request);
+                    $jmlkeluar = $this->calculateOutgoingStock($row, $request);
 
-                    // 2. Hitung jumlah barang masuk
-                    if ($request->tglawal == '') {
-                        $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
-                            ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
-                            ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
-                            ->sum('tbl_barangmasuk.bm_jumlah');
-                    } else {
-                        $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
-                            ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
-                            ->whereBetween('bm_tanggal', [$request->tglawal, $request->tglakhir])
-                            ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
-                            ->sum('tbl_barangmasuk.bm_jumlah');
-                    }
-
-                    // 3. Hitung jumlah barang keluar
-                    if ($request->tglawal) {
-                        $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
-                            ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
-                            ->whereBetween('bk_tanggal', [$request->tglawal, $request->tglakhir])
-                            ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
-                            ->sum('tbl_barangkeluar.bk_jumlah');
-                    } else {
-                        $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
-                            ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
-                            ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
-                            ->sum('tbl_barangkeluar.bk_jumlah');
-                    }
-
-                    // 4. Hitung total stok: stok awal + masuk - keluar
+                    // Total stock = stok awal + masuk - keluar
                     $totalstok = $stokawal + $jmlmasuk - $jmlkeluar;
 
-                    // Format tampilan total stok
+                    // Return formatted total stock
                     if ($totalstok == 0) {
-                        $result = '<span class="">' . $totalstok . '</span>';
-                    } else if ($totalstok > 0) {
-                        $result = '<span class="text-success">' . $totalstok . '</span>';
+                        return '<span>' . number_format($totalstok, 2) . '</span>';
+                    } elseif ($totalstok > 0) {
+                        return '<span class="text-success">' . number_format($totalstok, 2) . '</span>';
                     } else {
-                        $result = '<span class="text-danger">' . $totalstok . '</span>';
+                        return '<span class="text-danger">' . number_format($totalstok, 2) . '</span>';
                     }
-
-                    return $result;
                 })
-                ->rawColumns(['stokawal', 'jmlmasuk', 'jmlkeluar', 'totalstok'])->make(true);
+                ->rawColumns(['stokawal', 'jmlmasuk', 'jmlkeluar', 'selisih', 'totalstok'])
+                ->make(true);
         }
+    }
+
+    private function calculateIncomingStock($row, $request)
+    {
+        if ($request->tglawal) {
+            return BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
+                ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
+                ->whereBetween('bm_tanggal', [$request->tglawal, $request->tglakhir])
+                ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
+                ->sum('tbl_barangmasuk.bm_jumlah');
+        } else {
+            return BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
+                ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
+                ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
+                ->sum('tbl_barangmasuk.bm_jumlah');
+        }
+    }
+
+    private function calculateOutgoingStock($row, $request)
+    {
+        if ($request->tglawal) {
+            return BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
+                ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
+                ->whereBetween('bk_tanggal', [$request->tglawal, $request->tglakhir])
+                ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
+                ->sum('tbl_barangkeluar.bk_jumlah');
+        } else {
+            return BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
+                ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
+                ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
+                ->sum('tbl_barangkeluar.bk_jumlah');
+        }
+    }
+    private function getSelisih($barangKode)
+    {
+        // Ambil selisih dari StockOpnameRequestDetailModel berdasarkan barang_kode
+        $detail = StockOpnameRequestDetailModel::where('barang_kode', $barangKode)
+            ->latest() // Ambil yang terbaru
+            ->first();
+
+        // Pastikan detail ditemukan dan return selisihnya
+        if ($detail) {
+            return $detail->selisih;  // Mengambil nilai selisih
+        }
+
+        return 0;  // Jika tidak ada selisih, kembalikan 0
     }
 }
