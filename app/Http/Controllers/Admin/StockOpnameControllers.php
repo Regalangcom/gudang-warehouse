@@ -56,6 +56,7 @@ class StockOpnameControllers extends Controller
         // Hitung total stok untuk setiap detail
         foreach ($data["details"] as $detail) {
             $barangKode = $detail->barang->barang_kode;
+
             $stokAwal = $detail->barang->barang_stok;
 
             // Hitung jumlah barang masuk

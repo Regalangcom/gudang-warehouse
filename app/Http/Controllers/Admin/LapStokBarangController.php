@@ -153,7 +153,7 @@ class LapStokBarangController extends Controller
     private function getSelisih($barangKode)
     {
         // Ambil selisih dari StockOpnameRequestDetailModel berdasarkan barang_kode
-        $detail = StockOpnameRequestDetailModel::where('barang_kode', $barangKode)
+        $detail = StockOpnameRequestDetailModel::where('stock_in', $barangKode)
             ->latest() // Ambil yang terbaru
             ->first();
 
