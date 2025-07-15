@@ -87,7 +87,7 @@ class LapStokBarangController extends Controller
 
 
 
-                // SELISIH = stokawal – totalstok
+                // SELISIH = stokawal – totalstok | ini
                 ->addColumn('selisih', function ($row) use ($request) {
                     $stokawal = $row->barang_stok;
 
