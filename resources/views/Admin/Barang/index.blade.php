@@ -9,39 +9,38 @@
     <ol class="breadcrumb">
       <li class="breadcrumb-item text-gray">Master Data</li>
 
-      <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
+      <li class="breadcrumb-item active">{{ $title }}</li>
     </ol>
   </div>
 </div>
 
-<!-- DATA TABLE -->
+{{-- ========== TABEL DATA ========== --}}
 <div class="row row-sm">
   <div class="col-lg-12">
     <div class="card">
       <div class="card-header justify-content-between">
         <h3 class="card-title">Data</h3>
 
-        @if($hakTambah > 0)
-        <div>
-          <a class="btn btn-primary-light" data-bs-toggle="modal" href="#modaldemo8" onclick="resetRows()">
-            Tambah Data <i class="fe fe-plus"></i>
-          </a>
-        </div>
+        @if($hakTambah)
+        <a class="btn btn-primary-light" data-bs-toggle="modal"
+          href="#modaldemo8" data-bs-effect="effect-super-scaled"
+          onclick="resetRows()">Tambah Data <i class="fe fe-plus"></i></a>
         @endif
       </div>
+
       <div class="card-body">
         <div class="table-responsive">
-          <table id="table-1" class="table table-bordered text-nowrap border-bottom">
+          <table id="table-1" class="table table-bordered text-nowrap border-bottom w-100">
             <thead>
               <tr>
                 <th width="1%">No</th>
                 <th>Gambar</th>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
+                <th>Kode</th>
+                <th>Nama</th>
                 <th>Jenis</th>
                 <th>Satuan</th>
                 <th>Merk</th>
-                <th>Stok Awal</th>
+                <th>Stok</th>
                 <th>Harga</th>
                 <th width="1%">Action</th>
               </tr>
@@ -58,66 +57,59 @@
 {{-- =======================   M O D A L S   ===================== --}}
 {{-- ============================================================ --}}
 
-
-<!-- END DATA TABLE -->
-
-{{-- MODAL TAMBAH MULTI --}}
-<div class="modal fade" data-bs-backdrop="static" id="modaldemo8" tabindex="-1" aria-hidden="true">
+{{-- ---------- TAMBAH (multi-insert) ---------- --}}
+<div class="modal fade" id="modaldemo8" data-bs-backdrop="static" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content modal-content-demo">
+    <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title">Tambah Barang</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetRows()"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+          onclick="resetRows()"></button>
       </div>
       <div class="modal-body">
         <div id="barang-rows"></div>
-        <a href="javascript:void(0)" class="btn btn-sm btn-secondary mb-3" onclick="addRow()">
-          + Tambah Baris
-        </a>
+        <button type="button" class="btn btn-sm btn-secondary mt-2"
+          onclick="addRow()">+ Tambah Baris</button>
       </div>
       <div class="modal-footer">
         <button id="btnLoader" class="btn btn-primary d-none" disabled>
-          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-          Loading...
+          <span class="spinner-border spinner-border-sm me-1"></span> Loading…
         </button>
-        <a href="javascript:void(0)" id="btnSimpan" class="btn btn-primary" onclick="checkForm()">
+        <button id="btnSimpan" class="btn btn-primary" onclick="checkForm()">
           Simpan <i class="fe fe-check"></i>
-        </a>
-        <a href="javascript:void(0)" class="btn btn-light" data-bs-dismiss="modal" onclick="resetRows()">
-          Batal <i class="fe fe-x"></i>
-        </a>
+        </button>
+        <button class="btn btn-light" data-bs-dismiss="modal"
+          onclick="resetRows()">Batal <i class="fe fe-x"></i></button>
       </div>
     </div>
   </div>
 </div>
 
 
-{{-- TEMPLATE BARIS (hidden) --}}
+{{-- ---- template baris (hidden) ---- --}}
 <div id="template-row" class="d-none">
-  <div class="barang-row row mb-3 align-items-end">
+  <div class="barang-row row g-2 align-items-end mb-2">
     <div class="col-md-3">
-      <label class="form-label">Kode Barang <span class="text-danger">*</span></label>
-      <input type="text" name="kode[]" readonly class="form-control">
+      <label class="form-label">Kode <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" name="kode[]" readonly>
     </div>
     <div class="col-md-3">
-      <label class="form-label">Nama Barang <span class="text-danger">*</span></label>
-      <input type="text" name="nama[]" class="form-control">
+      <label class="form-label">Nama <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" name="nama[]">
     </div>
     <div class="col-md-2">
       <label class="form-label">Jenis</label>
-      <select name="jenisbarang[]" class="form-control">
+      <select class="form-control" name="jenisbarang[]">
         <option value="">-- Pilih --</option>
-        @foreach($jenisbarang as $jb)
-        <option value="{{ $jb->jenisbarang_id }}">{{ $jb->jenisbarang_nama }}</option>
-
-        <option value="{{ $jb->jenisbarang_id }}">{{ $jb->jenisbarang_nama }}</option>
+        @foreach($jenisbarang as $j)
+        <option value="{{ $j->jenisbarang_id }}">{{ $j->jenisbarang_nama }}</option>
         @endforeach
       </select>
     </div>
     <div class="col-md-2">
       <label class="form-label">Satuan</label>
 
-      <select name="satuan[]" class="form-control">
+      <select class="form-control" name="satuan[]">
         <option value="">-- Pilih --</option>
         @foreach($satuan as $s)
         <option value="{{ $s->satuan_id }}">{{ $s->satuan_nama }}</option>
@@ -127,30 +119,31 @@
     <div class="col-md-2">
       <label class="form-label">Merk</label>
 
-      <select name="merk[]" class="form-control">
+      <select class="form-control" name="merk[]">
         <option value="">-- Pilih --</option>
         @foreach($merk as $m)
         <option value="{{ $m->merk_id }}">{{ $m->merk_nama }}</option>
         @endforeach
       </select>
     </div>
-    <div class="col-md-3 mt-2">
+    <div class="col-md-3 mt-1">
       <label class="form-label">Harga <span class="text-danger">*</span></label>
-      <input type="text" name="harga[]" class="form-control"
-        oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+      <input type="text" class="form-control" name="harga[]"
+        oninput="this.value=this.value.replace(/[^0-9.]/g,'')">
     </div>
-    <div class="col-md-3 mt-2">
+    <div class="col-md-4 mt-1">
       <label class="form-label">Foto</label>
       <div class="d-flex align-items-center">
-        <img src="{{ url('/assets/default/barang/image.png') }}" class="outputImg me-2" width="60" alt="preview">
-        <input type="file" name="photo[]" class="form-control photo-input"
-          accept=".png,.jpeg,.jpg,.svg" onchange="VerifyFileNameAndFileSize(this)">
+        <img src="{{ url('/assets/default/barang/image.png') }}" width="60"
+          class="outputImg me-2">
+        <input type="file" class="form-control photo-input"
+          name="photo[]" accept=".png,.jpg,.jpeg,.svg"
+          onchange="VerifyFileNameAndFileSize(this)">
       </div>
     </div>
-    <div class="col-md-1 mt-2">
-      <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.barang-row').remove()">
-        &times;
-      </button>
+    <div class="col-md-1 mt-1">
+      <button type="button" class="btn btn-sm btn-danger"
+        onclick="$(this).closest('.barang-row').remove()">&times;</button>
     </div>
   </div>
 </div>
@@ -180,6 +173,7 @@
               <select name="jenisbarangU" class="form-control">
                 <option value="">-- Pilih --</option>
                 @foreach($jenisbarang as $j)
+
                 <option value="{{ $j->jenisbarang_id }}">{{ $j->jenisbarang_nama }}</option>
                 @endforeach
               </select>
@@ -189,6 +183,7 @@
               <select name="satuanU" class="form-control">
                 <option value="">-- Pilih --</option>
                 @foreach($satuan as $s)
+
                 <option value="{{ $s->satuan_id }}">{{ $s->satuan_nama }}</option>
                 @endforeach
               </select>
@@ -198,6 +193,7 @@
               <select name="merkU" class="form-control">
                 <option value="">-- Pilih --</option>
                 @foreach($merk as $m)
+
                 <option value="{{ $m->merk_id }}">{{ $m->merk_nama }}</option>
                 @endforeach
               </select>
@@ -211,6 +207,7 @@
             <div class="col-md-6">
               <label class="form-label">Harga</label>
               <input type="text" name="hargaU" class="form-control"
+
                 oninput="this.value=this.value.replace(/[^0-9.]/g,'')">
             </div>
           </div>
@@ -218,6 +215,7 @@
             <label class="form-label">Foto</label>
             <div class="d-flex align-items-center">
               <img id="outputImgU" width="70" class="me-2"
+
                 src="{{ url('/assets/default/barang/image.png') }}">
               <input type="file" name="foto" class="form-control"
                 accept=".png,.jpg,.jpeg,.svg">
@@ -258,6 +256,11 @@
 
 {{-- ---------- GAMBAR ---------- --}}
 <div class="modal fade" id="Gmodaldemo8" tabindex="-1">
+
+  @include('Admin.Barang.edit', ['jenisbarang'=>$jenisbarang,'satuan'=>$satuan,'merk'=>$merk])
+  @include('Admin.Barang.edit', ['jenisbarang'=>$jenisbarang,'satuan'=>$satuan,'merk'=>$merk])
+  @include('Admin.Barang.hapus')
+  @include('Admin.Barang.gambar')
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-body text-center">
@@ -267,278 +270,270 @@
     </div>
   </div>
 </div>
-=======
-@include('Admin.Barang.edit', ['jenisbarang'=>$jenisbarang,'satuan'=>$satuan,'merk'=>$merk])
-=======
-@include('Admin.Barang.edit', ['jenisbarang'=>$jenisbarang,'satuan'=>$satuan,'merk'=>$merk])
->>>>>>> eeeedc2 (up)
-@include('Admin.Barang.hapus')
-@include('Admin.Barang.gambar')
->>>>>>> 0b2f4c4 (up)
 @endsection
 
 {{-- =========================  S C R I P T  ========================= --}}
 @section('scripts')
 <script>
-  // Setup AJAX CSRF
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
 
-  // 1) Inisialisasi DataTable
-  var table;
-  $(document).ready(function() {
-    table = $('#table-1').DataTable({
-      processing: true,
-      serverSide: true,
-      scrollX: true,
-      stateSave: true,
-      ajax: "{{ route('barang.getbarang') }}",
-      columns: [{
-          data: 'DT_RowIndex',
-          name: 'DT_RowIndex',
-          orderable: false,
-          searchable: false
-        },
-        {
-          data: 'img',
-          name: 'barang_gambar',
-          orderable: false,
-          searchable: false
-        },
-        {
-          data: 'barang_kode',
-          name: 'barang_kode'
-        },
-        {
-          data: 'barang_nama',
-          name: 'barang_nama'
-        },
-        {
-          data: 'jenisbarang',
-          name: 'jenisbarang_nama'
-        },
-        {
-          data: 'satuan',
-          name: 'satuan_nama'
-        },
-        {
-          data: 'merk',
-          name: 'merk_nama'
-        },
-        {
-          data: 'barang_stok',
-          name: 'barang_stok'
-        },
-        {
-          data: 'currency',
-          name: 'barang_harga'
-        },
-        {
-          data: 'action',
-          name: 'action',
-          orderable: false,
-          searchable: false
-        }
-      ]
-    });
-
-    // siapkan 1 baris kosong di modal
-    resetRows();
+  /* ---------------- DATATABLE ---------------- */
+  let table = $('#table-1').DataTable({
+    processing: true,
+    serverSide: true,
+    stateSave: true,
+    scrollX: true,
+    ajax: "{{ route('barang.getbarang') }}", // route TANPA parameter
+    columns: [{
+        data: 'DT_RowIndex',
+        name: 'DT_RowIndex',
+        orderable: false,
+        searchable: false
+      },
+      {
+        data: 'img',
+        name: 'barang_gambar',
+        orderable: false,
+        searchable: false
+      },
+      {
+        data: 'barang_kode',
+        name: 'barang_kode'
+      },
+      {
+        data: 'barang_nama',
+        name: 'barang_nama'
+      },
+      {
+        data: 'jenisbarang',
+        name: 'jenisbarang_nama'
+      },
+      {
+        data: 'satuan',
+        name: 'satuan_nama'
+      },
+      {
+        data: 'merk',
+        name: 'merk_nama'
+      },
+      {
+        data: 'barang_stok',
+        name: 'barang_stok'
+      },
+      {
+        data: 'currency',
+        name: 'barang_harga'
+      },
+      {
+        data: 'action',
+        name: 'action',
+        orderable: false,
+        searchable: false
+      },
+    ]
   });
 
-  // 2) Tambah satu baris input
-  function addRow() {
-    let tpl = $('#template-row').html();
-    $('#barang-rows').append(tpl);
-    generateIDRow($('#barang-rows .barang-row').last());
-    generateIDRow($row);
-    dd($row)
-    console.log("Kode setelah generate:", $row.find("input[name='kode[]']").val());
-  }
-
-  // 3) Reset semua baris jadi 1
+  /* ================================================================= */
+  /* =============   TAMBAH BARANG  (MULTI-ROW)   ==================== */
+  /* ================================================================= */
   function resetRows() {
-    $('#barang-rows').html('');
+    $('#barang-rows').empty();
     addRow();
     setLoading(false);
   }
 
-  // 4) Generate kode barang unik per baris
-  // function generateIDRow($row) {
-  //   let kode = 'BRG-' + Date.now();
-  //   $row.find("input[name='kode[]']").val(kode);
-  // }
-
-  function generateIDRow($row) {
-    if (!$row.length) return;
-
-    let kode = 'BRG-' + Date.now() + Math.floor(Math.random() * 1000); // + random biar unik
-    let $kodeInput = $row.find("input[name='kode[]']");
-
-    // Pastikan input ditemukan
-    if ($kodeInput.length) {
-      $kodeInput.val(kode);
-    } else {
-      console.warn('Input kode[] tidak ditemukan di baris ini:', $row);
-    }
+  function addRow() {
+    $('#barang-rows').append($('#template-row').html());
+    $('#barang-rows .barang-row').last()
+      .find("[name='kode[]']")
+      .val('BRG-' + Date.now() + Math.floor(Math.random() * 90));
   }
-
-  // 5) Validasi & kirim form multi
-  function checkForm() {
-    setLoading(true);
-    let valid = true;
-    // hapus tanda invalid
-    $('#barang-rows').find('input, select').removeClass('is-invalid');
-
-    $('#barang-rows .barang-row').each(function(i, row) {
-      let $r = $(row),
-        kode = $r.find("input[name='kode[]']").val().trim(),
-        nama = $r.find("input[name='nama[]']").val().trim(),
-        harga = $r.find("input[name='harga[]']").val().trim();
-
-      if (!kode) {
-        swal('Baris ' + (i + 1) + ': Kode wajib diisi!', '', 'warning');
-        $r.find("input[name='kode[]']").addClass('is-invalid');
-        valid = false;
-        return false;
-      }
-      if (!nama) {
-        swal('Baris ' + (i + 1) + ': Nama wajib diisi!', '', 'warning');
-        $r.find("input[name='nama[]']").addClass('is-invalid');
-        valid = false;
-        return false;
-      }
-      if (!harga) {
-        swal('Baris ' + (i + 1) + ': Harga wajib diisi!', '', 'warning');
-        $r.find("input[name='harga[]']").addClass('is-invalid');
-        valid = false;
-        return false;
-      }
-    });
-
-    if (!valid) {
-      setLoading(false);
-      return;
-    }
-    submitForm();
-  }
-
-  // function submitForm() {
-  //   let fd = new FormData();
-  //   // append array fields
-  //   $("input[name='kode[]']").each((i, el) => fd.append('kode[]', el.value));
-  //   $("input[name='nama[]']").each((i, el) => fd.append('nama[]', el.value));
-  //   $("select[name='jenisbarang[]']").each((i, el) => fd.append('jenisbarang[]', el.value));
-  //   $("select[name='satuan[]']").each((i, el) => fd.append('satuan[]', el.value));
-  //   $("select[name='merk[]']").each((i, el) => fd.append('merk[]', el.value));
-  //   $("input[name='harga[]']").each((i, el) => fd.append('harga[]', el.value));
-  //   // file uploads
-  //   $(".photo-input").each((i, el) => {
-  //     if (el.files[0]) fd.append('photo[]', el.files[0]);
-  //   });
-
-  //   $.ajax({
-  //     type: 'POST',
-  //     url: "{{ route('barang.store') }}",
-  //     processData: false,
-  //     contentType: false,
-  //     dataType: 'json',
-  //     data: fd,
-  //     success: function() {
-  //       $('#modaldemo8').modal('hide');
-  //       swal('Berhasil ditambah!', '', 'success');
-  //       table.ajax.reload(null, false);
-  //       resetRows();
-  //     },
-  //     error: function() {
-  //       swal('Gagal menyimpan!', '', 'error');
-  //       setLoading(false);
-  //     }
-  //   });
-  // }
-
-
-  function submitForm() {
-    let fd = new FormData();
-
-    // Loop semua baris
-    $('#barang-rows .barang-row').each(function(i, row) {
-      let $r = $(row);
-      let kode = $r.find("input[name='kode[]']").val().trim();
-      let nama = $r.find("input[name='nama[]']").val().trim();
-      let jenisbarang = $r.find("select[name='jenisbarang[]']").val();
-      let satuan = $r.find("select[name='satuan[]']").val();
-      let merk = $r.find("select[name='merk[]']").val();
-      let harga = $r.find("input[name='harga[]']").val().trim();
-      let photoInput = $r.find("input[name='photo[]']")[0];
-
-      // ✅ Hanya kirim jika baris terisi
-      if (kode && nama && harga) {
-        fd.append('kode[]', kode);
-        fd.append('nama[]', nama);
-        fd.append('jenisbarang[]', jenisbarang);
-        fd.append('satuan[]', satuan);
-        fd.append('merk[]', merk);
-        fd.append('harga[]', harga);
-
-        // Kirim gambar jika ada
-        if (photoInput && photoInput.files.length > 0) {
-          fd.append('photo[]', photoInput.files[0]);
-        } else {
-          fd.append('photo[]', ''); // Tetap kirim agar sejajar dengan input lainnya
-        }
-      }
-    });
-
-    $.ajax({
-      type: 'POST',
-      url: "{{ route('barang.store') }}",
-      processData: false,
-      contentType: false,
-      dataType: 'json',
-      data: fd,
-      success: function() {
-        $('#modaldemo8').modal('hide');
-        swal('Berhasil ditambah!', '', 'success');
-        table.ajax.reload(null, false);
-        resetRows();
-      },
-      error: function(xhr, status, error) {
-        console.error("XHR Status:", status);
-        console.error("Error:", error);
-        // console.error("Response:", xhr.responseText);
-        swal('Gagal menyimpan!', xhr.responseText, 'error');
-        setLoading(false);
-      }
-    });
-  }
-
 
   function setLoading(on) {
     $('#btnLoader').toggleClass('d-none', !on);
     $('#btnSimpan').toggleClass('d-none', on);
   }
 
-  // 6) Validasi & preview gambar
-  function VerifyFileNameAndFileSize(input) {
-    let file = input.files[0];
-    if (!file) return;
-    let ext = file.name.split('.').pop().toLowerCase();
-    if (!['png', 'jpg', 'jpeg', 'svg'].includes(ext)) {
-      swal('Format bukan gambar!', '', 'warning');
-      input.value = '';
+  /* ------------ validasi & submit ------------ */
+  function checkForm() {
+    setLoading(true);
+    let ok = true;
+    $('#barang-rows input,#barang-rows select').removeClass('is-invalid');
+
+    $('#barang-rows .barang-row').each(function(_, row) {
+      const $r = $(row);
+      const kode = $r.find("[name='kode[]']").val().trim();
+      const nama = $r.find("[name='nama[]']").val().trim();
+      const harga = $r.find("[name='harga[]']").val().trim();
+      if (!(kode && nama && harga)) {
+        ['kode', 'nama', 'harga'].forEach(n => {
+          const el = $r.find(`[name='${n}[]']`);
+          if (!el.val().trim()) el.addClass('is-invalid');
+        });
+        ok = false;
+      }
+    });
+
+    if (!ok) {
+      setLoading(false);
+      swal('Isian wajib masih kosong', '', 'warning');
       return;
     }
-    if (file.size > 3 * 1024 * 1024) {
-      swal('Ukuran maksimum 3 MB', '', 'warning');
-      input.value = '';
-      return;
-    }
-    let url = URL.createObjectURL(file);
-    $(input).closest('.barang-row').find('.outputImg').attr('src', url);
+    submitForm();
   }
+
+  function submitForm() {
+    const fd = new FormData();
+    $('#barang-rows .barang-row').each(function(_, row) {
+      const $r = $(row);
+      const kode = $r.find("[name='kode[]']").val().trim();
+      const nama = $r.find("[name='nama[]']").val().trim();
+      const harga = $r.find("[name='harga[]']").val().trim();
+      if (!(kode && nama && harga)) return; // abaikan baris invalid
+
+      fd.append('kode[]', kode);
+      fd.append('nama[]', nama);
+      fd.append('jenisbarang[]', $r.find("[name='jenisbarang[]']").val());
+      fd.append('satuan[]', $r.find("[name='satuan[]']").val());
+      fd.append('merk[]', $r.find("[name='merk[]']").val());
+      fd.append('harga[]', harga);
+
+      const fi = $r.find(".photo-input")[0];
+      fd.append('photo[]', fi && fi.files[0] ? fi.files[0] : '');
+    });
+
+    $.post({
+        url: "{{ route('barang.store') }}",
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+      .done(() => {
+        $('#modaldemo8').modal('hide');
+        swal('Berhasil ditambah', '', 'success');
+        table.ajax.reload(null, false);
+        resetRows();
+      })
+      .fail(x => {
+        swal('Error', x.responseText, 'error');
+        setLoading(false);
+      });
+  }
+
+  /* ------------ preview foto tiap baris ------------ */
+  function VerifyFileNameAndFileSize(i) {
+    const f = i.files[0];
+    if (!f) return;
+    const ext = f.name.split('.').pop().toLowerCase();
+    if (!['png', 'jpg', 'jpeg', 'svg'].includes(ext)) {
+      swal('Format salah', '', 'warning');
+      i.value = '';
+      return;
+    }
+    if (f.size > 3 * 1024 * 1024) {
+      swal('Max 3 MB', '', 'warning');
+      i.value = '';
+      return;
+    }
+    $(i).closest('.barang-row').find('.outputImg').attr('src', URL.createObjectURL(f));
+  }
+
+  /* ================================================================= */
+  /* ========== FUNGSI UPDATE / HAPUS / PREVIEW GAMBAR =============== */
+  /* ================================================================= */
+  function update(d) {
+    $("input[name='idbarangU']").val(d.barang_id);
+    $("input[name='kodeU']").val(d.barang_kode);
+    $("input[name='namaU']").val(d.barang_nama.replace(/_/g, ' '));
+    $("select[name='jenisbarangU']").val(d.jenisbarang_id);
+    $("select[name='satuanU']").val(d.satuan_id);
+    $("select[name='merkU']").val(d.merk_id);
+    $("input[name='stokU']").val(d.barang_stok);
+    $("input[name='hargaU']").val(d.barang_harga);
+    const img = d.barang_gambar !== 'image.png' ?
+      "{{ asset('storage/barang') }}/" + d.barang_gambar :
+      "{{ url('/assets/default/barang/image.png') }}";
+    $('#outputImgU').attr('src', img);
+  }
+
+  function hapus(d) {
+    $("input[name='idbarang']").val(d.barang_id);
+    $("#vbarang").html("barang <b>" + d.barang_nama.replace(/_/g, ' ') + "</b>");
+  }
+
+  function gambar(d) {
+    const img = d.barang_gambar !== 'image.png' ?
+      "{{ asset('storage/barang') }}/" + d.barang_gambar :
+      "{{ url('/assets/default/barang/image.png') }}";
+    $('#outputImgG').attr('src', img);
+  }
+
+  /* ---------------- SUBMIT EDIT ---------------- */
+  $('#formEdit').on('submit', function(e) {
+    e.preventDefault();
+    $('#btnUpdateLoad').removeClass('d-none');
+    $('#btnUpdate').addClass('d-none');
+
+    const id = $("input[name='idbarangU']").val();
+    const fd = new FormData(this);
+    fd.append('kode', fd.get('kodeU'));
+    fd.append('nama', fd.get('namaU'));
+    fd.append('jenisbarang', fd.get('jenisbarangU'));
+    fd.append('satuan', fd.get('satuanU'));
+    fd.append('merk', fd.get('merkU'));
+    fd.append('harga', fd.get('hargaU'));
+    fd.append('stok', fd.get('stokU'));
+
+    $.post({
+        url: "{{ url('/admin/barang/proses_ubah') }}/" + id,
+        data: fd,
+        processData: false,
+        contentType: false
+      })
+      .done(() => {
+        $('#Umodaldemo8').modal('hide');
+        swal('Berhasil diperbarui', '', 'success');
+        table.ajax.reload(null, false);
+      })
+      .fail(x => {
+        swal('Error', x.responseText, 'error');
+      })
+      .always(() => {
+        $('#btnUpdateLoad').addClass('d-none');
+        $('#btnUpdate').removeClass('d-none');
+      });
+  });
+
+  /* ---------------- SUBMIT DELETE ---------------- */
+  $('#btnConfirmDelete').on('click', function() {
+    const id = $("input[name='idbarang']").val();
+
+    $.ajax({
+      type: 'POST',
+      url: "{{ url('admin/barang/proses_hapus') }}/" + id,
+      data: {
+        _token: "{{ csrf_token() }}"
+      }, // wajib kalau pakai Laravel
+      success: function(data) {
+        swal({
+            title: "Berhasil dihapus!",
+            type: "success",
+            confirmButtonText: "OK"
+          },
+          function() {
+            // callback dipanggil setelah user menutup alert
+            window.location.reload(); // refresh halaman
+          }
+        );
+      },
+      error: function() {
+        window.location.reload(); // refresh halaman
+      }
+    });
+  });
 </script>
 @endsection

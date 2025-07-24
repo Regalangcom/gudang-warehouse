@@ -302,7 +302,7 @@ class BarangController extends Controller
     }
 
 
-    public function destroy(Request $request, BarangModel $barang)
+    public function proses_hapus(Request $request, BarangModel $barang)
     {
         //delete image
         Storage::delete('public/barang/' . $barang->barang_gambar);
