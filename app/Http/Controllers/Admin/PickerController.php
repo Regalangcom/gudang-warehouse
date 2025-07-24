@@ -239,7 +239,7 @@ class PickerController extends Controller
         ]);
 
         $barang->update([
-            'barang_stok'=> $barang->barang_stok + $selisih
+            'barang_stok'=> $stockIn
         ]);
 
         // Ambil data barang

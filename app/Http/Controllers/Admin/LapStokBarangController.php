@@ -102,7 +102,37 @@ class LapStokBarangController extends Controller
                     $jmlmasuk = $this->calculateIncomingStock($row, $request);
                     $jmlkeluar = $this->calculateOutgoingStock($row, $request);
 
-                    // Total stock = stok awal + masuk - keluar
+
+                    // 2. Hitung jumlah barang masuk
+                    if ($request->tglawal == '') {
+                        $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
+                            ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
+                            ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
+                            ->sum('tbl_barangmasuk.bm_jumlah');
+                    } else {
+                        $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
+                            ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
+                            ->whereBetween('bm_tanggal', [$request->tglawal, $request->tglakhir])
+                            ->where('tbl_barangmasuk.barang_kode', '=', $row->barang_kode)
+                            ->sum('tbl_barangmasuk.bm_jumlah');
+                    }
+
+                    // 3. Hitung jumlah barang keluar
+                    if ($request->tglawal) {
+                        $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
+                            ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
+                            ->whereBetween('bk_tanggal', [$request->tglawal, $request->tglakhir])
+                            ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
+                            ->sum('tbl_barangkeluar.bk_jumlah');
+                    } else {
+                        $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
+                            ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
+                            ->where('tbl_barangkeluar.barang_kode', '=', $row->barang_kode)
+                            ->sum('tbl_barangkeluar.bk_jumlah');
+                    }
+
+                    // 4. Hitung total stok: stok awal + masuk - keluar
+                    // $totalstok = $stokawal;
                     $totalstok = $stokawal + $jmlmasuk - $jmlkeluar;
 
                     // Return formatted total stock
