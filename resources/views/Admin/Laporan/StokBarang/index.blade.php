@@ -132,7 +132,8 @@
                     orderable: false,
                 },
                 {
-                    data: 'selisih', // Add this line to include the "selisih" column
+
+                    data: 'selisih',
                     name: 'selisih',
                     searchable: false,
                     orderable: false,
