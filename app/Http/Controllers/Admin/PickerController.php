@@ -184,19 +184,7 @@ class PickerController extends Controller
         
         // Ambil kode barang dari detail
         $barangKode = $detail->barang_kode ?? $detail->barang_id;
-<<<<<<< HEAD
-        // return response()->json(['debug' => $barangKode]);
-        $barang = BarangModel::where('barang_id', $detail->barang_id)
-            ->first();
 
-        // Hitung total stok sistem menggunakan metode sebelumnya
-        $stokawal = $detail->barang->barang_stok;
-
-        // value default stock
-        // get stock awal default
-        $stockawalbanget = $barang->barang_stok;
-        // return response()->json(['jmlmasuk' => $stockawalbanget]);
-=======
         $barang = BarangModel::where('barang_id', $detail->barang_id)
             ->first();
         // return response()->json(['debug' => $barang]);
@@ -237,15 +225,9 @@ class PickerController extends Controller
         // Update data detail stock opname (catat hasil fisik dan status pengecekan)
         // Simpan semua info penting di detail stock opname (jika field tersedia)
         $detail->update([
-<<<<<<< HEAD
-            'stock_awal' => round($stockSystem), // simpan stok sistem sebelum opname (jika field tersedia)
-            'stock_in' => round($stockIn),       // hasil fisik
-            'selisih' => round($selisih), // simpan selisih (jika field tersedia)
-=======
+
             'stock_in' => $stockIn,
-<<<<<<< HEAD
             'stock_system' => $detail->stock_system + $selisih,
->>>>>>> e32ac20 (up)
             'is_checked' => true,
         ]);
 
@@ -253,7 +235,6 @@ class PickerController extends Controller
         $barang->update([
             'barang_stok' => max(0, $stockIn) // Pastikan stok tidak negatif
         ]);
-=======
             'is_checked' => true,
         ]);
 
@@ -263,7 +244,6 @@ class PickerController extends Controller
 
         // Ambil data barang
         // $barang = BarangModel::findOrFail($detail->barang_id);
->>>>>>> 0b2f4c4 (up)
 
 
         // Response JSON tetap bisa menampilkan info perbandingan
@@ -275,44 +255,5 @@ class PickerController extends Controller
             // 'barang_stok_default' => round($stockawalbanget)
         ]);
     }
-
-
-    // // Get total stock for AJAX request
-    // public function getTotalStock(Request $request)
-    // {
-    //     // Validate the request
-    //     $request->validate([
-    //         'barang_kode' => 'required'
-    //     ]);
-
-    //     $barangKode = $request->barang_kode;
-
-    //     try {
-    //         // Calculate total stock using the same logic as in updateStock
-    //         $jmlmasuk = BarangmasukModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
-    //             ->leftJoin('tbl_supplier', 'tbl_supplier.supplier_id', '=', 'tbl_barangmasuk.supplier_id')
-    //             ->where('tbl_barangmasuk.barang_kode', '=', $barangKode)
-    //             ->sum('tbl_barangmasuk.bm_jumlah');
-
-    //         $jmlkeluar = BarangkeluarModel::leftJoin('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangkeluar.barang_kode')
-    //             ->leftJoin('tbl_customer', 'tbl_customer.customer_id', '=', 'tbl_barangkeluar.customer_id')
-    //             ->where('tbl_barangkeluar.barang_kode', '=', $barangKode)
-    //             ->sum('tbl_barangkeluar.bk_jumlah');
-
-    //         // Calculate total stock
-    //         $totalStock = $jmlmasuk - $jmlkeluar;
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'totalStock' => $totalStock
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error calculating total stock: ' . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
 
 }
