@@ -175,14 +175,16 @@ class PickerController extends Controller
     {
         $detail = StockOpnameRequestDetailModel::findOrFail($id);
 
+        
         // Cek apakah user memiliki stock opname
         $stockOpname = StockOpnameRequestModel::findOrFail($detail->stock_id);
         if ($stockOpname->user_id != Session::get('user')->user_id) {
             return response()->json(['error' => 'Tindakan tidak diizinkan'], 403);
         }
-
+        
         // Ambil kode barang dari detail
         $barangKode = $detail->barang_kode ?? $detail->barang_id;
+<<<<<<< HEAD
         // return response()->json(['debug' => $barangKode]);
         $barang = BarangModel::where('barang_id', $detail->barang_id)
             ->first();
@@ -194,6 +196,11 @@ class PickerController extends Controller
         // get stock awal default
         $stockawalbanget = $barang->barang_stok;
         // return response()->json(['jmlmasuk' => $stockawalbanget]);
+=======
+        $barang = BarangModel::where('barang_id', $detail->barang_id)
+            ->first();
+        // return response()->json(['debug' => $barang]);
+>>>>>>> 0b2f4c4 (up)
 
         // Hitung total stok menggunakan metode dari kode pertama
         $jmlmasuk = BarangmasukModel::with('tbl_barang', 'tbl_barang.barang_kode', '=', 'tbl_barangmasuk.barang_kode')
@@ -236,6 +243,7 @@ class PickerController extends Controller
             'selisih' => round($selisih), // simpan selisih (jika field tersedia)
 =======
             'stock_in' => $stockIn,
+<<<<<<< HEAD
             'stock_system' => $detail->stock_system + $selisih,
 >>>>>>> e32ac20 (up)
             'is_checked' => true,
@@ -245,6 +253,17 @@ class PickerController extends Controller
         $barang->update([
             'barang_stok' => max(0, $stockIn) // Pastikan stok tidak negatif
         ]);
+=======
+            'is_checked' => true,
+        ]);
+
+        $barang->update([
+            'barang_stok'=> $barang->barang_stok + $selisih
+        ]);
+
+        // Ambil data barang
+        // $barang = BarangModel::findOrFail($detail->barang_id);
+>>>>>>> 0b2f4c4 (up)
 
 
         // Response JSON tetap bisa menampilkan info perbandingan
