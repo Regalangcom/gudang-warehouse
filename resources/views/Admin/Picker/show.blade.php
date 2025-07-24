@@ -43,14 +43,9 @@
                 </div>
               </td>
               <td>
-                @if($detail->stock_in !== null)
                 @php
-                $selisih = $detail->stock_in - ($totalStocks[$detail->stock_detail_id] ?? 0);
-                $totalStok = $totalStocks[$detail->stock_detail_id] + $selisih ?? 0;
-                @endphp
-                @else
                 $totalStok = $totalStocks[$detail->stock_detail_id] ?? 0;
-                @endif
+                @endphp
                 @if($totalStok == 0)
                 <span class="">{{ number_format($totalStok, 2) }}</span>
                 @elseif($totalStok > 0)

@@ -230,9 +230,14 @@ class PickerController extends Controller
         // Update data detail stock opname (catat hasil fisik dan status pengecekan)
         // Simpan semua info penting di detail stock opname (jika field tersedia)
         $detail->update([
+<<<<<<< HEAD
             'stock_awal' => round($stockSystem), // simpan stok sistem sebelum opname (jika field tersedia)
             'stock_in' => round($stockIn),       // hasil fisik
             'selisih' => round($selisih), // simpan selisih (jika field tersedia)
+=======
+            'stock_in' => $stockIn,
+            'stock_system' => $detail->stock_system + $selisih,
+>>>>>>> e32ac20 (up)
             'is_checked' => true,
         ]);
 
